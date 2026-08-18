@@ -49,3 +49,12 @@ $forbiddenClaims | ForEach-Object {
 }
 
 Write-Host 'PASS: approved content'
+
+@('--bg: #101116','--surface: #181A22','--text: #F4F1EA','--accent: #806BFF') | ForEach-Object {
+    if (-not $html.Contains($_)) { throw "Missing design token: $_" }
+}
+Assert-Contains '@media\s*\(max-width:\s*767px\)' 'Missing mobile breakpoint'
+Assert-Contains '@media\s*\(min-width:\s*768px\)' 'Missing tablet/desktop breakpoint'
+Assert-Contains 'min-height:\s*44px' 'Missing minimum tap target rule'
+Assert-Contains ':focus-visible' 'Missing focus-visible styles'
+Write-Host 'PASS: design contract'

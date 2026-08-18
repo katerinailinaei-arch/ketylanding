@@ -1,31 +1,666 @@
 <!doctype html>
 <html lang="ru">
-  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Мастерская творений</title></head>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Мастерская творений</title>
+    <style>
+      :root {
+        --bg: #101116;
+        --surface: #181A22;
+        --surface-raised: #20232D;
+        --text: #F4F1EA;
+        --text-muted: #A8A9B2;
+        --line: #303440;
+        --accent: #806BFF;
+        --accent-2: #50D5FF;
+        --success: #71D7A0;
+        --danger: #FF7D8D;
+        --font-sans: Manrope, Inter, "Segoe UI", Arial, sans-serif;
+        --font-mono: "IBM Plex Mono", "Cascadia Mono", Consolas, monospace;
+        --container: 1240px;
+        --page-cap: 1440px;
+        --gutter: clamp(1.25rem, 4vw, 4.5rem);
+        --section-space: clamp(5.5rem, 10vw, 10rem);
+        --radius-sm: 20px;
+        --radius-lg: 28px;
+        --shadow: 0 24px 80px rgba(0, 0, 0, .28);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 6rem;
+        overflow-x: hidden;
+        background: var(--bg);
+      }
+
+      body {
+        min-width: 320px;
+        max-width: var(--page-cap);
+        margin: 0 auto;
+        overflow-x: hidden;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 76% 7%, rgba(128, 107, 255, .13), transparent 25rem),
+          radial-gradient(circle at 5% 42%, rgba(80, 213, 255, .055), transparent 28rem),
+          var(--bg);
+        font-family: var(--font-sans);
+        font-size: clamp(1rem, 1.2vw, 1.125rem);
+        line-height: 1.65;
+        text-rendering: optimizeLegibility;
+      }
+
+      body::before {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background-image:
+          linear-gradient(rgba(244, 241, 234, .018) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(244, 241, 234, .018) 1px, transparent 1px);
+        background-size: 48px 48px;
+        content: "";
+        pointer-events: none;
+      }
+
+      img, svg { display: block; max-width: 100%; }
+      h1, h2, h3, p { margin-top: 0; }
+      h1, h2, h3 { text-wrap: balance; }
+
+      h1 {
+        max-width: 11ch;
+        margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+        font-size: clamp(2.75rem, 7vw, 7.5rem);
+        font-weight: 650;
+        letter-spacing: -.065em;
+        line-height: .92;
+      }
+
+      h2 {
+        max-width: 16ch;
+        margin-bottom: clamp(1.25rem, 2.5vw, 2rem);
+        font-size: clamp(2rem, 4.5vw, 4.75rem);
+        font-weight: 620;
+        letter-spacing: -.052em;
+        line-height: 1;
+      }
+
+      h3 {
+        margin-bottom: .85rem;
+        font-size: clamp(1.35rem, 2vw, 2rem);
+        line-height: 1.18;
+      }
+
+      p { max-width: 70ch; }
+
+      a {
+        color: inherit;
+        text-decoration-color: rgba(80, 213, 255, .65);
+        text-decoration-thickness: .08em;
+        text-underline-offset: .22em;
+      }
+
+      a, button { min-height: 44px; }
+
+      a:focus-visible, button:focus-visible {
+        outline: 3px solid var(--accent-2);
+        outline-offset: 4px;
+        border-radius: 6px;
+      }
+
+      .skip-link {
+        position: fixed;
+        top: .75rem;
+        left: .75rem;
+        z-index: 100;
+        display: inline-flex;
+        align-items: center;
+        padding: .65rem 1rem;
+        border-radius: 999px;
+        background: var(--text);
+        color: var(--bg);
+        font-weight: 750;
+        transform: translateY(-180%);
+      }
+
+      .skip-link:focus { transform: translateY(0); }
+
+      .container,
+      main > section,
+      footer {
+        width: min(calc(100% - (2 * var(--gutter))), var(--container));
+        margin-inline: auto;
+      }
+
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        border-bottom: 1px solid rgba(244, 241, 234, .08);
+        background: rgba(16, 17, 22, .88);
+      }
+
+      .site-nav {
+        display: flex;
+        min-height: 76px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+      }
+
+      .nav-brand {
+        display: inline-flex;
+        min-width: max-content;
+        align-items: center;
+        gap: .75rem;
+        font-size: .94rem;
+        font-weight: 750;
+        text-decoration: none;
+      }
+
+      .nav-brand::before {
+        width: 12px;
+        height: 12px;
+        border: 3px solid var(--accent-2);
+        border-radius: 3px;
+        box-shadow: 6px 6px 0 var(--accent);
+        content: "";
+      }
+
+      .nav-brand span,
+      .eyebrow,
+      article > p:first-child,
+      .concept-copy > p:first-child {
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+        font-size: .75rem;
+        letter-spacing: .11em;
+        line-height: 1.4;
+        text-transform: uppercase;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: clamp(.85rem, 1.8vw, 1.6rem);
+        font-size: .88rem;
+        white-space: nowrap;
+      }
+
+      .nav-links a { display: inline-flex; align-items: center; text-decoration: none; }
+      .nav-links a:not(.button) { color: var(--text-muted); }
+
+      .button {
+        display: inline-flex;
+        min-height: 48px;
+        align-items: center;
+        justify-content: center;
+        gap: .55rem;
+        padding: .75rem 1.2rem;
+        border: 1px solid transparent;
+        border-radius: 999px;
+        background: var(--accent);
+        color: #fff;
+        font-weight: 750;
+        line-height: 1.2;
+        text-align: center;
+        text-decoration: none;
+      }
+
+      .button::after { content: "↗"; font-family: var(--font-mono); }
+
+      .button--secondary {
+        border-color: var(--line);
+        background: transparent;
+        color: var(--text);
+      }
+
+      .button--secondary::after { content: "↓"; }
+
+      .hero {
+        display: grid;
+        min-height: min(850px, calc(100svh - 76px));
+        align-items: center;
+        gap: clamp(2.5rem, 7vw, 6rem);
+        padding-block: clamp(4rem, 8vw, 8rem);
+      }
+
+      .hero__copy > p:not(.eyebrow) { max-width: 57ch; color: var(--text-muted); }
+
+      .hero__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .75rem;
+        margin: clamp(1.75rem, 4vw, 2.5rem) 0 1.25rem;
+      }
+
+      .hero__note { font-family: var(--font-mono); font-size: .82rem; }
+
+      .hero__visual {
+        position: relative;
+        isolation: isolate;
+        width: 100%;
+        aspect-ratio: 720 / 520;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        background:
+          linear-gradient(rgba(244, 241, 234, .025) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(244, 241, 234, .025) 1px, transparent 1px),
+          var(--surface);
+        background-size: 32px 32px;
+        box-shadow: var(--shadow);
+      }
+
+      .hero__visual::before {
+        position: absolute;
+        width: 44%;
+        aspect-ratio: 1;
+        top: 21%;
+        left: 28%;
+        z-index: -1;
+        border-radius: 50%;
+        background: rgba(128, 107, 255, .18);
+        filter: blur(52px);
+        content: "";
+      }
+
+      .workshop-map { width: 100%; height: 100%; }
+      .workshop-map__line { fill: none; stroke: #505565; stroke-width: 2; }
+      .workshop-map__line--accent { stroke: var(--accent-2); }
+      .workshop-map__node rect { fill: var(--surface-raised); stroke: #3c4150; }
+      .workshop-map__node text { fill: var(--text-muted); font: 600 13px var(--font-mono); letter-spacing: .08em; }
+      .workshop-map__hub rect { fill: var(--accent); stroke: #a89aff; }
+      .workshop-map__hub text { fill: #fff; font: 700 16px var(--font-mono); letter-spacing: .08em; }
+      .workshop-map__output rect { fill: rgba(113, 215, 160, .09); stroke: var(--success); }
+      .workshop-map__output text { fill: var(--success); font: 700 14px var(--font-mono); letter-spacing: .06em; }
+      .workshop-map__status { fill: var(--accent-2); }
+
+      main > section { padding-block: var(--section-space); }
+      main > section + section { border-top: 1px solid rgba(244, 241, 234, .08); }
+      section > h2 + p { max-width: 65ch; margin-bottom: clamp(2rem, 5vw, 4rem); color: var(--text-muted); }
+
+      #solutions {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 1rem;
+      }
+
+      #solutions > h2, #solutions > p { grid-column: 1 / -1; }
+
+      #solutions article,
+      .concept-copy,
+      .process-step,
+      .faq-item {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-sm);
+        background: var(--surface);
+      }
+
+      #solutions article {
+        position: relative;
+        grid-column: span 4;
+        display: flex;
+        min-height: 370px;
+        flex-direction: column;
+        padding: clamp(1.4rem, 3vw, 2rem);
+        overflow: hidden;
+      }
+
+      #solutions article::after {
+        position: absolute;
+        right: -2rem;
+        bottom: -3rem;
+        width: 9rem;
+        aspect-ratio: 1;
+        border: 1px solid rgba(128, 107, 255, .28);
+        border-radius: 50%;
+        box-shadow: 0 0 0 1.6rem rgba(128, 107, 255, .04), 0 0 0 3.2rem rgba(80, 213, 255, .025);
+        content: "";
+      }
+
+      #solutions article > p:not(:first-child) { color: var(--text-muted); }
+      #solutions article a { margin-top: auto; align-self: flex-start; font-weight: 700; }
+
+      #concepts > article {
+        display: grid;
+        margin-top: 1.25rem;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+      }
+
+      .concept-copy { padding: clamp(1.5rem, 4vw, 3rem); border-radius: 0; }
+      .concept-copy dl { display: grid; grid-template-columns: minmax(5.5rem, .35fr) 1fr; gap: .6rem 1rem; }
+      .concept-copy dt { color: var(--text-muted); font-family: var(--font-mono); font-size: .76rem; letter-spacing: .08em; text-transform: uppercase; }
+      .concept-copy dd { margin: 0; }
+
+      .concept-visual {
+        position: relative;
+        min-height: 320px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        background: #12141b;
+      }
+
+      .concept-visual::before {
+        position: absolute;
+        inset: 9% 8%;
+        border: 1px solid #3a3f4d;
+        border-radius: 16px;
+        background: var(--surface-raised);
+        box-shadow: 0 36px 70px rgba(0, 0, 0, .35);
+        content: "";
+      }
+
+      .concept-visual span { position: absolute; display: block; z-index: 1; border-radius: 999px; background: #373b49; }
+      .concept-visual span:nth-child(1) { top: 16%; left: 14%; width: 38%; height: 9px; background: var(--accent); }
+      .concept-visual span:nth-child(2) { top: 24%; left: 14%; width: 56%; height: 7px; }
+      .concept-visual span:nth-child(3) { top: 34%; left: 14%; width: 33%; height: 35%; border-radius: 12px; background: rgba(80, 213, 255, .12); border: 1px solid rgba(80, 213, 255, .35); }
+      .concept-visual span:nth-child(4) { top: 34%; right: 14%; width: 34%; height: 16%; border-radius: 12px; background: rgba(128, 107, 255, .16); border: 1px solid rgba(128, 107, 255, .45); }
+      .concept-visual span:nth-child(5) { top: 56%; right: 14%; width: 34%; height: 13%; border-radius: 12px; }
+      .concept-visual--app span:nth-child(3) { width: 18%; height: 46%; background: #262a35; border-color: #3a3f4d; }
+      .concept-visual--app span:nth-child(4) { right: 14%; width: 48%; height: 28%; }
+      .concept-visual--app span:nth-child(5) { top: 66%; right: 14%; width: 48%; height: 12%; background: rgba(113, 215, 160, .18); }
+      .concept-visual--ai span:nth-child(3) { width: 25%; height: 13%; border-radius: 999px; }
+      .concept-visual--ai span:nth-child(4) { top: 51%; left: 14%; right: auto; width: 46%; height: 13%; border-radius: 999px; }
+      .concept-visual--ai span:nth-child(5) { top: 68%; right: 14%; width: 52%; height: 8px; background: var(--success); }
+
+      #method ol {
+        display: grid;
+        margin: clamp(2rem, 5vw, 4rem) 0 0;
+        padding: 0;
+        list-style: none;
+        counter-reset: method;
+      }
+
+      #method li {
+        position: relative;
+        padding: 1.35rem 1rem 1.35rem 4.4rem;
+        border-top: 1px solid var(--line);
+        color: var(--text-muted);
+        counter-increment: method;
+      }
+
+      #method li::before {
+        position: absolute;
+        left: 0;
+        color: var(--accent-2);
+        font: 700 .82rem var(--font-mono);
+        content: "0" counter(method);
+      }
+
+      #method li strong { color: var(--text); font-family: var(--font-mono); font-size: .88rem; letter-spacing: .06em; }
+
+      #process {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 1rem;
+      }
+
+      #process > h2 { grid-column: 1 / -1; }
+
+      .process-step {
+        position: relative;
+        grid-column: span 3;
+        padding: clamp(1.25rem, 2.5vw, 1.8rem);
+      }
+
+      .process-step::before {
+        display: grid;
+        width: 2rem;
+        aspect-ratio: 1;
+        margin-bottom: 2.5rem;
+        place-items: center;
+        border: 1px solid var(--accent);
+        border-radius: 50%;
+        color: var(--accent-2);
+        font: 700 .75rem var(--font-mono);
+        content: "0" counter(process-step);
+      }
+
+      #process { counter-reset: process-step; }
+      .process-step { counter-increment: process-step; }
+      .process-step p { color: var(--text-muted); }
+      #process > .button { grid-column: 1 / -1; justify-self: start; margin-top: 1.5rem; }
+
+      #about {
+        display: grid;
+        align-items: start;
+        gap: clamp(2rem, 7vw, 6rem);
+      }
+
+      #about h2, #about > p, #about > ul { grid-column: 1; }
+      #about > ul { display: grid; gap: .65rem; margin: 1rem 0 0; padding: 0; list-style: none; }
+      #about li { padding: 1rem 0; border-top: 1px solid var(--line); color: var(--text-muted); }
+      #about li strong { color: var(--text); }
+
+      .portrait-placeholder {
+        position: relative;
+        grid-row: 1 / span 4;
+        display: grid;
+        min-height: 520px;
+        place-items: end start;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        background:
+          radial-gradient(circle at 50% 34%, rgba(80, 213, 255, .19), transparent 16%),
+          radial-gradient(ellipse at 50% 88%, rgba(128, 107, 255, .28), transparent 43%),
+          var(--surface);
+      }
+
+      .portrait-placeholder::before {
+        position: absolute;
+        top: 21%;
+        left: 50%;
+        width: 28%;
+        aspect-ratio: 1;
+        border: 1px solid rgba(244, 241, 234, .35);
+        border-radius: 50%;
+        background: rgba(244, 241, 234, .07);
+        content: "";
+        transform: translateX(-50%);
+      }
+
+      .portrait-placeholder::after {
+        position: absolute;
+        right: 15%;
+        bottom: 12%;
+        left: 15%;
+        height: 44%;
+        border: 1px solid rgba(244, 241, 234, .28);
+        border-radius: 50% 50% 18% 18%;
+        background: rgba(244, 241, 234, .055);
+        content: "";
+      }
+
+      .portrait-placeholder span {
+        z-index: 1;
+        margin: 1rem;
+        padding: .45rem .7rem;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(16, 17, 22, .82);
+        font: 700 .72rem var(--font-mono);
+        letter-spacing: .1em;
+        text-transform: uppercase;
+      }
+
+      #faq > h2 { margin-bottom: clamp(2rem, 5vw, 4rem); }
+      .faq-item { margin-bottom: .75rem; padding: clamp(1.1rem, 2vw, 1.45rem) clamp(1.2rem, 3vw, 2rem); }
+      .faq-item h3 { margin: 0; }
+      .faq-item button { width: 100%; padding: 0; border: 0; background: transparent; color: var(--text); font: inherit; font-weight: 700; text-align: left; cursor: pointer; }
+      .faq-item p { margin: .9rem 0 0; color: var(--text-muted); }
+
+      #contact {
+        margin-block: var(--section-space);
+        padding: clamp(2rem, 7vw, 5rem);
+        border: 1px solid rgba(128, 107, 255, .6);
+        border-radius: var(--radius-lg);
+        background:
+          radial-gradient(circle at 85% 10%, rgba(80, 213, 255, .15), transparent 18rem),
+          linear-gradient(135deg, rgba(128, 107, 255, .18), rgba(32, 35, 45, .88));
+        box-shadow: var(--shadow);
+      }
+
+      #contact h2 { max-width: 13ch; }
+      #contact > p { color: var(--text-muted); }
+      #contact > .button { margin-block: 1rem; }
+
+      footer {
+        display: flex;
+        align-items: center;
+        gap: 1rem 2rem;
+        padding-block: 2.25rem;
+        border-top: 1px solid var(--line);
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+        font-size: .75rem;
+        letter-spacing: .05em;
+      }
+
+      footer p { margin: 0; }
+      footer a { display: inline-flex; align-items: center; }
+      footer p:last-child { margin-left: auto; }
+
+      @supports (backdrop-filter: blur(12px)) {
+        .site-header { background: rgba(16, 17, 22, .72); backdrop-filter: blur(18px); }
+      }
+
+      @media (max-width: 767px) {
+        :root { --gutter: 1.25rem; }
+        html { scroll-padding-top: 5rem; }
+        .site-nav { min-height: 68px; }
+        .nav-brand span { display: none; }
+        .nav-links { margin-right: calc(var(--gutter) * -1); padding-right: var(--gutter); overflow-x: auto; scrollbar-width: none; }
+        .nav-links::-webkit-scrollbar { display: none; }
+        .nav-links a:not(.button) { display: none; }
+        .nav-links .button { min-height: 44px; padding: .65rem .85rem; font-size: .78rem; }
+        .hero { grid-template-columns: minmax(0, 1fr); min-height: auto; }
+        .hero__actions { flex-direction: column; }
+        .hero__actions .button { width: 100%; }
+        .hero__visual { min-height: 285px; }
+        #solutions { display: block; }
+        #solutions article { min-height: 330px; margin-top: 1rem; }
+        #concepts > article { grid-template-columns: minmax(0, 1fr); }
+        .concept-visual { min-height: 270px; }
+        .concept-copy dl { grid-template-columns: 1fr; }
+        .concept-copy dd { margin-bottom: .65rem; }
+        #process { display: block; }
+        .process-step { margin-top: .75rem; }
+        #process > .button { margin-top: 1.5rem; width: 100%; }
+        #about { grid-template-columns: minmax(0, 1fr); }
+        #about h2, #about > p, #about > ul { grid-column: 1; }
+        .portrait-placeholder { grid-column: 1; grid-row: auto; min-height: 400px; }
+        footer { flex-wrap: wrap; }
+        footer p:last-child { width: 100%; margin-left: 0; }
+      }
+
+      @media (min-width: 768px) {
+        .hero { grid-template-columns: minmax(0, 1.05fr) minmax(340px, .95fr); }
+        #concepts > article { grid-template-columns: minmax(0, 1.04fr) minmax(300px, .96fr); }
+        #concepts > article:nth-of-type(even) .concept-copy { order: 2; }
+        #about { grid-template-columns: minmax(0, 1.05fr) minmax(300px, .75fr); }
+        .portrait-placeholder { grid-column: 2; }
+      }
+
+      @media (min-width: 768px) and (max-width: 1099px) {
+        .site-nav { flex-wrap: wrap; padding-block: .7rem; }
+        .nav-links { width: 100%; justify-content: space-between; }
+        #solutions article { grid-column: span 12; min-height: auto; }
+        .process-step { grid-column: span 6; }
+      }
+    </style>
+  </head>
   <body>
     <script type="application/json" id="site-config">{"telegramUrl":"https://t.me/USERNAME"}</script>
-    <a href="#main">Перейти к содержимому</a>
-    <header id="top">
-      <nav aria-label="Основная навигация">
-        <a href="#main">Мастерская творений <span>DIGITAL WORKSHOP</span></a>
-        <a href="#solutions">Решения</a><a href="#concepts">Концепты</a><a href="#process">Процесс</a><a href="#about">О мастерской</a><a href="#faq">FAQ</a>
-        <a href="https://t.me/USERNAME" data-telegram-link target="_blank" rel="noopener noreferrer">Обсудить задачу в Telegram</a>
+    <a class="skip-link" href="#main">Перейти к содержимому</a>
+    <header class="site-header" id="top">
+      <nav class="site-nav container" aria-label="Основная навигация">
+        <a class="nav-brand" href="#main">Мастерская творений <span>DIGITAL WORKSHOP</span></a>
+        <div class="nav-links">
+          <a href="#solutions">Решения</a><a href="#concepts">Концепты</a><a href="#process">Процесс</a><a href="#about">О мастерской</a><a href="#faq">FAQ</a>
+          <a class="button" href="https://t.me/USERNAME" data-telegram-link target="_blank" rel="noopener noreferrer">Обсудить задачу в Telegram</a>
+        </div>
       </nav>
-      <p>ЦИФРОВАЯ МАСТЕРСКАЯ • САЙТЫ • ПРИЛОЖЕНИЯ • ИИ</p>
-      <h1>Превращаю идеи в цифровые решения, которые работают на вас</h1>
-      <p>Создаю сайты, MVP-приложения и ИИ-автоматизации для экспертов и малого бизнеса — понятно, бережно и с фокусом на реальную задачу.</p>
-      <a href="https://t.me/USERNAME" data-telegram-link target="_blank" rel="noopener noreferrer">Обсудить задачу в Telegram</a>
-      <a href="#concepts">Посмотреть концепты</a><p>Сначала разбираемся в задаче — потом выбираем технологию.</p>
     </header>
     <main id="main">
+      <section class="hero">
+        <div class="hero__copy">
+          <p class="eyebrow">ЦИФРОВАЯ МАСТЕРСКАЯ • САЙТЫ • ПРИЛОЖЕНИЯ • ИИ</p>
+          <h1>Превращаю идеи в цифровые решения, которые работают на вас</h1>
+          <p>Создаю сайты, MVP-приложения и ИИ-автоматизации для экспертов и малого бизнеса — понятно, бережно и с фокусом на реальную задачу.</p>
+          <div class="hero__actions">
+            <a class="button" href="https://t.me/USERNAME" data-telegram-link target="_blank" rel="noopener noreferrer">Обсудить задачу в Telegram</a>
+            <a class="button button--secondary" href="#concepts">Посмотреть концепты</a>
+          </div>
+          <p class="hero__note">Сначала разбираемся в задаче — потом выбираем технологию.</p>
+        </div>
+        <div class="hero__visual">
+          <svg class="workshop-map" viewBox="0 0 720 520" width="720" height="520" aria-hidden="true" focusable="false">
+            <defs>
+              <marker id="map-arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#50D5FF" />
+              </marker>
+            </defs>
+            <path class="workshop-map__line workshop-map__line--accent" d="M180 132 C238 132 236 260 284 260" marker-end="url(#map-arrow)" />
+            <path class="workshop-map__line workshop-map__line--accent" d="M430 260 C480 260 476 116 524 116" marker-end="url(#map-arrow)" />
+            <path class="workshop-map__line" d="M430 260 C484 260 478 218 524 218" marker-end="url(#map-arrow)" />
+            <path class="workshop-map__line" d="M430 260 C484 260 478 320 524 320" marker-end="url(#map-arrow)" />
+            <path class="workshop-map__line workshop-map__line--accent" d="M604 348 L604 398" marker-end="url(#map-arrow)" />
+            <g class="workshop-map__node" data-node="input">
+              <rect x="44" y="94" width="136" height="76" rx="18" />
+              <text x="112" y="126" text-anchor="middle">ИДЕЯ /</text>
+              <text x="112" y="148" text-anchor="middle">ЗАДАЧА</text>
+            </g>
+            <g class="workshop-map__hub" data-node="workshop">
+              <rect x="284" y="211" width="146" height="98" rx="24" />
+              <text x="357" y="253" text-anchor="middle">МАСТЕРСКАЯ</text>
+              <text x="357" y="278" text-anchor="middle">ТВОРЕНИЙ</text>
+            </g>
+            <g class="workshop-map__node" data-node="website">
+              <rect x="524" y="84" width="160" height="64" rx="18" />
+              <text x="604" y="122" text-anchor="middle">САЙТ</text>
+            </g>
+            <g class="workshop-map__node" data-node="mvp">
+              <rect x="524" y="186" width="160" height="64" rx="18" />
+              <text x="604" y="224" text-anchor="middle">MVP</text>
+            </g>
+            <g class="workshop-map__node" data-node="agent">
+              <rect x="524" y="288" width="160" height="64" rx="18" />
+              <text x="604" y="326" text-anchor="middle">ИИ-АГЕНТ</text>
+            </g>
+            <g class="workshop-map__output">
+              <rect x="466" y="410" width="218" height="72" rx="20" />
+              <text x="575" y="440" text-anchor="middle">РАБОТАЮЩЕЕ</text>
+              <text x="575" y="462" text-anchor="middle">РЕШЕНИЕ</text>
+            </g>
+            <circle class="workshop-map__status" cx="68" cy="60" r="5" />
+            <text x="86" y="65" fill="#A8A9B2" font-family="IBM Plex Mono, Consolas, monospace" font-size="12">WORKFLOW / 01</text>
+          </svg>
+        </div>
+      </section>
       <section id="solutions"><h2>С какой задачей вы пришли?</h2><p>Необязательно заранее знать, какой инструмент нужен. Начнём с результата, которого вы хотите достичь.</p>
         <article><p>01 / ПРИВЛЕЧЕНИЕ</p><h3>Нужны заявки</h3><p>Спроектирую понятный сайт, который объясняет вашу ценность и ведёт посетителя к обращению.</p><p><strong>Результат:</strong> оффер, структура, адаптивный интерфейс, запуск.</p><a href="#concept-website">Смотреть концепт сайта</a></article>
         <article><p>02 / ЗАПУСК</p><h3>Нужно запустить идею</h3><p>Соберу основной сценарий MVP без лишних функций, чтобы показать, проверить и развивать продукт.</p><p><strong>Результат:</strong> прототип, ключевой путь, интерфейс, рабочая версия.</p><a href="#concept-app">Смотреть концепт MVP</a></article>
         <article><p>03 / АВТОМАТИЗАЦИЯ</p><h3>Нужно убрать рутину</h3><p>Найду повторяющийся процесс и предложу ИИ-автоматизацию с понятными границами и контролем человека.</p><p><strong>Результат:</strong> сценарий, интеграции, проверка, пилот.</p><a href="#concept-ai">Смотреть концепт агента</a></article>
       </section>
       <section id="concepts"><h2>Три способа превратить задачу в работающий инструмент</h2><p>Портфолио мастерской только формируется. Ниже — собственные концепты, которые показывают мой подход к структуре, интерфейсам и автоматизации.</p>
-        <article id="concept-website"><p>Собственный концепт — не клиентский проект</p><h3>Точка опоры</h3><dl><dt>Тип</dt><dd>Сайт для консультанта или автора программы.</dd><dt>Задача</dt><dd>Ясно раскрыть ценность услуги и привести посетителя к записи.</dd><dt>Решение</dt><dd>Hero с результатом, программа, формат работы, доверие, FAQ, запись.</dd><dt>Артефакты</dt><dd>Desktop- и mobile-мокапы, карта с секциями.</dd></dl><p>Помогает превратить экспертность в понятный путь к обращению.</p></article>
-        <article id="concept-app"><p>Собственный концепт — не клиентский проект</p><h3>Пульс проекта</h3><dl><dt>Тип</dt><dd>Web-приложение для сопровождения клиентов.</dd><dt>Задача</dt><dd>Собрать задачи, материалы, прогресс и коммуникацию в одном месте.</dd><dt>Решение</dt><dd>Dashboard, этапы, файлы, сообщения, ближайшее действие.</dd><dt>Артефакты</dt><dd>Ключевой пользовательский путь и 3–4 экрана.</dd></dl><p>Помогает запустить и проверить основную ценность продукта без лишнего scope.</p></article>
-        <article id="concept-ai"><p>Собственный концепт — не клиентский проект</p><h3>Навигатор</h3><dl><dt>Тип</dt><dd>ИИ-автоматизация для малого бизнеса.</dd><dt>Задача</dt><dd>Разбирать входящие обращения и готовить следующий шаг.</dd><dt>Решение</dt><dd>Запрос → поиск в базе знаний → черновик ответа → проверка человеком → запись действия.</dd><dt>Артефакты</dt><dd>Схема данных, экран диалога и журнал действий.</dd></dl><p>Сокращает повторяющуюся работу, сохраняя контроль у человека.</p></article>
+        <article id="concept-website">
+          <div class="concept-copy"><p>Собственный концепт — не клиентский проект</p><h3>Точка опоры</h3><dl><dt>Тип</dt><dd>Сайт для консультанта или автора программы.</dd><dt>Задача</dt><dd>Ясно раскрыть ценность услуги и привести посетителя к записи.</dd><dt>Решение</dt><dd>Hero с результатом, программа, формат работы, доверие, FAQ, запись.</dd><dt>Артефакты</dt><dd>Desktop- и mobile-мокапы, карта с секциями.</dd></dl><p>Помогает превратить экспертность в понятный путь к обращению.</p></div>
+          <div class="concept-visual" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+        </article>
+        <article id="concept-app">
+          <div class="concept-copy"><p>Собственный концепт — не клиентский проект</p><h3>Пульс проекта</h3><dl><dt>Тип</dt><dd>Web-приложение для сопровождения клиентов.</dd><dt>Задача</dt><dd>Собрать задачи, материалы, прогресс и коммуникацию в одном месте.</dd><dt>Решение</dt><dd>Dashboard, этапы, файлы, сообщения, ближайшее действие.</dd><dt>Артефакты</dt><dd>Ключевой пользовательский путь и 3–4 экрана.</dd></dl><p>Помогает запустить и проверить основную ценность продукта без лишнего scope.</p></div>
+          <div class="concept-visual concept-visual--app" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+        </article>
+        <article id="concept-ai">
+          <div class="concept-copy"><p>Собственный концепт — не клиентский проект</p><h3>Навигатор</h3><dl><dt>Тип</dt><dd>ИИ-автоматизация для малого бизнеса.</dd><dt>Задача</dt><dd>Разбирать входящие обращения и готовить следующий шаг.</dd><dt>Решение</dt><dd>Запрос → поиск в базе знаний → черновик ответа → проверка человеком → запись действия.</dd><dt>Артефакты</dt><dd>Схема данных, экран диалога и журнал действий.</dd></dl><p>Сокращает повторяющуюся работу, сохраняя контроль у человека.</p></div>
+          <div class="concept-visual concept-visual--ai" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+        </article>
       </section>
       <section id="method"><h2>Сначала задача. Затем — подходящий инструмент</h2><ol><li><strong>ЗАДАЧА</strong> — Что должно измениться для клиента или команды?</li><li><strong>ДИАГНОСТИКА</strong> — Кому, зачем и в каком контексте нужно решение?</li><li><strong>ФОРМАТ</strong> — Сайт, MVP, автоматизация или их комбинация.</li><li><strong>ПРОТОТИП</strong> — Проверяем структуру и основной сценарий.</li><li><strong>ЗАПУСК</strong> — Собираем, тестируем, передаём и улучшаем.</li></ol></section>
       <section id="process"><h2>Понятный путь от разговора до запуска</h2>
@@ -33,8 +668,8 @@
         <article class="process-step"><h3>Выбираем формат</h3><p>Определяем, нужен ли сайт, MVP, автоматизация или более простой способ решить задачу.</p><p><strong>Результат этапа:</strong> предложение по объёму, этапам и стоимости.</p></article>
         <article class="process-step"><h3>Проектируем и собираем</h3><p>Согласуем структуру и ключевой сценарий, затем создаём рабочую версию с промежуточными показами.</p><p><strong>Результат этапа:</strong> прототип и реализованное решение.</p></article>
         <article class="process-step"><h3>Проверяем и запускаем</h3><p>Тестируем основные сценарии, исправляем дефекты, публикуем и передаём материалы.</p><p><strong>Результат этапа:</strong> запущенный продукт, доступы и понятные дальнейшие шаги.</p></article>
-        <a href="https://t.me/USERNAME" data-telegram-link target="_blank" rel="noopener noreferrer">Обсудить задачу в Telegram</a></section>
-      <section id="about"><h2>Технологии — инструмент. В центре всегда ваша задача</h2><p>Я Кети, создатель «Мастерской творений». Соединяю дизайн, разработку и возможности ИИ, чтобы превращать сложные идеи в понятные цифровые инструменты.</p><p>Сейчас я формирую портфолио, поэтому честно показываю собственные концепты вместо вымышленных клиентских историй и особенно внимательно отношусь к логике каждого решения.</p><ul><li><strong>Сначала смысл:</strong> не начинаю разработку с выбора модной технологии.</li><li><strong>Показываю процесс:</strong> ключевые решения и промежуточные результаты видны клиенту.</li><li><strong>Не усложняю без пользы:</strong> MVP решает одну главную задачу.</li><li><strong>Сохраняю контроль:</strong> ИИ помогает человеку, а не скрывает критические действия.</li></ul></section>
+        <a class="button" href="https://t.me/USERNAME" data-telegram-link target="_blank" rel="noopener noreferrer">Обсудить задачу в Telegram</a></section>
+      <section id="about"><h2>Технологии — инструмент. В центре всегда ваша задача</h2><p>Я Кети, создатель «Мастерской творений». Соединяю дизайн, разработку и возможности ИИ, чтобы превращать сложные идеи в понятные цифровые инструменты.</p><p>Сейчас я формирую портфолио, поэтому честно показываю собственные концепты вместо вымышленных клиентских историй и особенно внимательно отношусь к логике каждого решения.</p><ul><li><strong>Сначала смысл:</strong> не начинаю разработку с выбора модной технологии.</li><li><strong>Показываю процесс:</strong> ключевые решения и промежуточные результаты видны клиенту.</li><li><strong>Не усложняю без пользы:</strong> MVP решает одну главную задачу.</li><li><strong>Сохраняю контроль:</strong> ИИ помогает человеку, а не скрывает критические действия.</li></ul><div class="portrait-placeholder" role="img" aria-label="Графический заполнитель для будущей фотографии Кети"><span>Фото Кети</span></div></section>
       <section id="faq"><h2>Частые вопросы перед началом</h2>
         <article class="faq-item"><h3><button type="button" aria-expanded="true" aria-controls="faq-answer-1">Как понять, что мне нужно: сайт, приложение или ИИ-агент?</button></h3><p id="faq-answer-1">Необязательно выбирать заранее. На первом обсуждении определим задачу, ограничения и самый простой формат, который способен дать нужный результат.</p></article>
         <article class="faq-item"><h3><button type="button" aria-expanded="true" aria-controls="faq-answer-2">Сколько стоит работа?</button></h3><p id="faq-answer-2">Стоимость определяется после короткого обсуждения задачи. Она зависит от объёма, числа сценариев, интеграций и готовности исходных материалов. До начала работы вы получите понятное предложение по этапам и стоимости.</p></article>
@@ -44,7 +679,7 @@
         <article class="faq-item"><h3><button type="button" aria-expanded="true" aria-controls="faq-answer-6">Что происходит после запуска?</button></h3><p id="faq-answer-6">Перед запуском согласуем период исправления обнаруженных дефектов и, при необходимости, отдельный формат сопровождения и развития.</p></article>
         <article class="faq-item"><h3><button type="button" aria-expanded="true" aria-controls="faq-answer-7">Безопасно ли подключать ИИ к данным бизнеса?</button></h3><p id="faq-answer-7">Архитектура зависит от типа данных и допустимого риска. До пилота определяются источники, права доступа, используемые модели, хранение, журналирование и действия, которые требуют подтверждения человеком.</p></article>
       </section>
-      <section id="contact"><h2>Есть идея или процесс, который давно хочется улучшить?</h2><p>Расскажите о задаче в Telegram. Я задам несколько вопросов и предложу понятный следующий шаг — без обязательства заранее выбирать технологию.</p><a href="https://t.me/USERNAME" data-telegram-link target="_blank" rel="noopener noreferrer">Обсудить задачу в Telegram</a><p>Стоимость — после короткого обсуждения задачи.</p></section>
+      <section id="contact"><h2>Есть идея или процесс, который давно хочется улучшить?</h2><p>Расскажите о задаче в Telegram. Я задам несколько вопросов и предложу понятный следующий шаг — без обязательства заранее выбирать технологию.</p><a class="button" href="https://t.me/USERNAME" data-telegram-link target="_blank" rel="noopener noreferrer">Обсудить задачу в Telegram</a><p>Стоимость — после короткого обсуждения задачи.</p></section>
     </main>
     <footer><p>© 2026 Мастерская творений</p><p>Создано Кети</p><a href="https://t.me/USERNAME" data-telegram-link target="_blank" rel="noopener noreferrer">Telegram</a><a href="#top">Наверх</a><p>САЙТЫ • MVP • ИИ-АВТОМАТИЗАЦИИ</p></footer>
   </body>
