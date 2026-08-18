@@ -58,3 +58,12 @@ Assert-Contains '@media\s*\(min-width:\s*768px\)' 'Missing tablet/desktop breakp
 Assert-Contains 'min-height:\s*44px' 'Missing minimum tap target rule'
 Assert-Contains ':focus-visible' 'Missing focus-visible styles'
 Write-Host 'PASS: design contract'
+
+if ($html -match 'scroll-behavior:\s*smooth') { throw 'Smooth scrolling is not allowed in Task 3' }
+Write-Host 'PASS: no Task 3 animation behavior'
+Assert-Contains '(?s)\.button\s*\{[^}]*color:\s*var\(--bg\)' 'Primary CTA foreground must contrast with the accent background'
+Write-Host 'PASS: primary CTA contrast contract'
+@('website','mvp','agent') | ForEach-Object {
+    Assert-Contains "data-route=`"$_-to-output`"" "Missing workshop route from $_ to final output"
+}
+Write-Host 'PASS: workshop convergence contract'
