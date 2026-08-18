@@ -76,3 +76,7 @@ Assert-Contains 'aria-expanded' 'Missing expandable control semantics'
 Assert-Contains 'IntersectionObserver' 'Missing progressive reveal observer'
 Assert-Contains 'class="no-js"' 'Missing no-js baseline class'
 Write-Host 'PASS: interaction contract'
+
+Assert-Contains '(?s)\.no-js\s+\.nav-menu-toggle\s*\{[^}]*display:\s*none' 'No-JS baseline must hide the inert menu toggle'
+Assert-Contains '(?s)\.no-js\s+\.nav-links\s*\{[^}]*display:\s*flex' 'No-JS baseline must keep navigation links visible'
+Write-Host 'PASS: no-JS navigation baseline'
