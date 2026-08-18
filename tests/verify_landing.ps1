@@ -44,12 +44,15 @@ Assert-Contains 'data-event="cta_telegram_click"' 'Missing analytics hook'
 $faqItems = [regex]::Matches($html, '(?s)<article class="faq-item">.*?</article>')
 if ($faqItems.Count -ne 7) { throw "Expected exactly seven FAQ items. Actual: $($faqItems.Count)" }
 $faqIds = @()
+$qualifyingFaqButtonCount = 0
 foreach ($faqItem in $faqItems) {
-    $faqButton = [regex]::Match($faqItem.Value, '<button[^>]+data-event="faq_open"[^>]+data-faq="([^"]+)"')
-    if (-not $faqButton.Success) { throw 'Every FAQ control needs an event and stable context.' }
-    if ([string]::IsNullOrWhiteSpace($faqButton.Groups[1].Value)) { throw 'FAQ context must not be empty.' }
-    $faqIds += $faqButton.Groups[1].Value
+    $faqButtons = [regex]::Matches($faqItem.Value, '<button[^>]+data-event="faq_open"[^>]+data-faq="([^"]+)"')
+    if ($faqButtons.Count -ne 1) { throw "Every FAQ item needs exactly one analytics control. Actual: $($faqButtons.Count)" }
+    if ([string]::IsNullOrWhiteSpace($faqButtons[0].Groups[1].Value)) { throw 'FAQ context must not be empty.' }
+    $faqIds += $faqButtons[0].Groups[1].Value
+    $qualifyingFaqButtonCount += $faqButtons.Count
 }
+if ($qualifyingFaqButtonCount -ne 7) { throw "Expected exactly seven qualifying FAQ controls. Actual: $qualifyingFaqButtonCount" }
 if ((@($faqIds | Select-Object -Unique)).Count -ne 7) { throw 'FAQ context values must be unique.' }
 if ($html -match '<section id="faq"[^>]*data-event=') { throw 'FAQ analytics hook must be on interactive controls.' }
 Write-Host 'PASS: metadata contract'
