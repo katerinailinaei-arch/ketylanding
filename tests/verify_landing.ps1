@@ -1,4 +1,6 @@
-﻿$ErrorActionPreference = 'Stop'
+﻿param([switch]$PublishReady)
+
+$ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $landingPath = Join-Path $root 'index.html'
 
@@ -30,6 +32,16 @@ Assert-Contains '<footer\b' 'Missing footer'
 }
 
 Write-Host 'PASS: semantic skeleton'
+
+Assert-Contains '<title>Мастерская творений — сайты, MVP и ИИ-автоматизации</title>' 'Title mismatch'
+Assert-Contains '<meta[^>]+name="description"' 'Missing meta description'
+Assert-Contains '<meta[^>]+property="og:title"' 'Missing Open Graph title'
+Assert-Contains '<meta[^>]+property="og:description"' 'Missing Open Graph description'
+Assert-Contains '<meta[^>]+property="og:image"' 'Missing Open Graph image'
+Assert-Contains '<meta[^>]+name="theme-color"' 'Missing theme color'
+Assert-Contains 'application/ld\+json' 'Missing JSON-LD'
+Assert-Contains 'data-event="cta_telegram_click"' 'Missing analytics hook'
+Write-Host 'PASS: metadata contract'
 
 Assert-Contains 'Превращаю идеи в цифровые решения, которые работают на вас' 'Hero copy mismatch'
 Assert-Contains 'Нужны заявки' 'Missing leads scenario'
@@ -80,3 +92,18 @@ Write-Host 'PASS: interaction contract'
 Assert-Contains '(?s)\.no-js\s+\.nav-menu-toggle\s*\{[^}]*display:\s*none' 'No-JS baseline must hide the inert menu toggle'
 Assert-Contains '(?s)\.no-js\s+\.nav-links\s*\{[^}]*display:\s*flex' 'No-JS baseline must keep navigation links visible'
 Write-Host 'PASS: no-JS navigation baseline'
+
+if ($PublishReady) {
+    $unresolvedMarkers = @(
+        @{ Pattern = 'USERNAME'; Message = 'Publish-ready blocked: replace Telegram USERNAME with the owner-supplied username.' },
+        @{ Pattern = 'https://example\.'; Message = 'Publish-ready blocked: replace example public URL markers with the owner-supplied public URL and OG image URL.' },
+        @{ Pattern = '(?i)(?:src|href|content)="[^"]*placeholder[^"]*"'; Message = 'Publish-ready blocked: replace placeholder final asset markers.' },
+        @{ Pattern = 'OWNER_SUPPLIED_(?:PUBLIC_URL|OG_IMAGE)'; Message = 'Publish-ready blocked: replace unresolved canonical or Open Graph URL markers.' }
+    )
+
+    foreach ($marker in $unresolvedMarkers) {
+        if ($html -match $marker.Pattern) { throw $marker.Message }
+    }
+
+    Write-Host 'PASS: publish-ready gate'
+}
