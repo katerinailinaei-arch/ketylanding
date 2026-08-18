@@ -397,20 +397,36 @@
 
       #method li {
         position: relative;
-        padding: 1.35rem 1rem 1.35rem 4.4rem;
+        padding: 0;
         border-top: 1px solid var(--line);
-        color: var(--text-muted);
         counter-increment: method;
       }
 
       #method li::before {
         position: absolute;
+        top: 1.35rem;
         left: 0;
+        z-index: 1;
         color: var(--accent-2);
         font: 700 .82rem var(--font-mono);
         content: "0" counter(method);
+        pointer-events: none;
       }
 
+      .method-stage {
+        width: 100%;
+        min-height: 44px;
+        padding: 1.35rem 1rem 1.35rem 4.4rem;
+        border: 0;
+        background: transparent;
+        color: var(--text-muted);
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .method-stage:hover { background: rgba(128, 107, 255, .08); }
+      .method-stage.is-active { background: rgba(128, 107, 255, .14); box-shadow: inset 3px 0 0 var(--accent); color: var(--text); }
       #method li strong { color: var(--text); font-family: var(--font-mono); font-size: .88rem; letter-spacing: .06em; }
 
       #process {
@@ -723,7 +739,7 @@
           <div class="concept-visual concept-visual--ai" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
         </article>
       </section>
-      <section id="method"><h2>Сначала задача. Затем — подходящий инструмент</h2><ol><li><strong>ЗАДАЧА</strong> — Что должно измениться для клиента или команды?</li><li><strong>ДИАГНОСТИКА</strong> — Кому, зачем и в каком контексте нужно решение?</li><li><strong>ФОРМАТ</strong> — Сайт, MVP, автоматизация или их комбинация.</li><li><strong>ПРОТОТИП</strong> — Проверяем структуру и основной сценарий.</li><li><strong>ЗАПУСК</strong> — Собираем, тестируем, передаём и улучшаем.</li></ol></section>
+      <section id="method"><h2>Сначала задача. Затем — подходящий инструмент</h2><ol><li><button class="method-stage is-active" type="button" data-method-stage aria-current="step"><strong>ЗАДАЧА</strong> — Что должно измениться для клиента или команды?</button></li><li><button class="method-stage" type="button" data-method-stage><strong>ДИАГНОСТИКА</strong> — Кому, зачем и в каком контексте нужно решение?</button></li><li><button class="method-stage" type="button" data-method-stage><strong>ФОРМАТ</strong> — Сайт, MVP, автоматизация или их комбинация.</button></li><li><button class="method-stage" type="button" data-method-stage><strong>ПРОТОТИП</strong> — Проверяем структуру и основной сценарий.</button></li><li><button class="method-stage" type="button" data-method-stage><strong>ЗАПУСК</strong> — Собираем, тестируем, передаём и улучшаем.</button></li></ol></section>
       <section id="process"><h2>Понятный путь от разговора до запуска</h2>
         <article class="process-step"><h3>Разбираемся в задаче</h3><p>Обсуждаем цель, аудиторию, текущий процесс и критерии полезного результата.</p><p><strong>Результат этапа:</strong> краткое понимание задачи и следующий шаг.</p></article>
         <article class="process-step"><h3>Выбираем формат</h3><p>Определяем, нужен ли сайт, MVP, автоматизация или более простой способ решить задачу.</p><p><strong>Результат этапа:</strong> предложение по объёму, этапам и стоимости.</p></article>
@@ -771,10 +787,17 @@
           if (returnFocus) toggle.focus();
         };
 
+        const menuItems = () => [toggle, ...Array.from(links.querySelectorAll('a[href]'))];
+
         toggle.addEventListener('click', () => {
           const isOpen = links.dataset.open === 'true';
-          links.dataset.open = String(!isOpen);
-          toggle.setAttribute('aria-expanded', String(!isOpen));
+          if (isOpen) {
+            closeMenu(false);
+            return;
+          }
+          links.dataset.open = 'true';
+          toggle.setAttribute('aria-expanded', 'true');
+          links.querySelector('a[href]')?.focus();
         });
         links.addEventListener('click', (event) => {
           if (event.target.closest('a')) closeMenu(false);
@@ -783,8 +806,24 @@
           if (mobileQuery.matches && !nav.contains(event.target)) closeMenu(false);
         });
         document.addEventListener('keydown', (event) => {
-          if (event.key === 'Escape' && mobileQuery.matches && links.dataset.open === 'true') {
+          if (!mobileQuery.matches || links.dataset.open !== 'true') return;
+          if (event.key === 'Escape') {
             closeMenu(true);
+            return;
+          }
+          if (event.key !== 'Tab') return;
+          const items = menuItems();
+          const first = items[0];
+          const last = items[items.length - 1];
+          if (!items.includes(document.activeElement)) {
+            event.preventDefault();
+            items[1]?.focus();
+          } else if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
           }
         });
         const resetForDesktop = () => {
@@ -859,6 +898,20 @@
         else mobileQuery.addListener(applyMode);
       }
 
+      function initMethod() {
+        const stages = Array.from(document.querySelectorAll('[data-method-stage]'));
+        if (stages.length !== 5) return;
+        const activate = (activeStage) => {
+          stages.forEach((stage) => {
+            const selected = stage === activeStage;
+            stage.setAttribute('aria-current', selected ? 'step' : 'false');
+            stage.classList.toggle('is-active', selected);
+          });
+        };
+        stages.forEach((stage) => stage.addEventListener('click', () => activate(stage)));
+        activate(stages[0]);
+      }
+
       function initFaq() {
         document.querySelectorAll('.faq-item button[aria-controls]').forEach((button) => {
           const answer = document.getElementById(button.getAttribute('aria-controls'));
@@ -895,6 +948,7 @@
       applySiteConfig();
       initMenu();
       initConcepts();
+      initMethod();
       initFaq();
       initReveal();
     </script>

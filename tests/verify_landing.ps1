@@ -99,6 +99,8 @@ Write-Host 'PASS: workshop convergence contract'
 @('function initMenu','function initConcepts','function initFaq','function initReveal','function applySiteConfig') | ForEach-Object {
     if (-not $html.Contains($_)) { throw "Missing interaction function: $_" }
 }
+Assert-Contains 'function initMethod' 'Missing method-stage interaction function'
+Assert-Count '<button\b[^>]*\bdata-method-stage(?:\s|=|>)' 5 'Five native method-stage buttons required.'
 Assert-Contains 'prefers-reduced-motion:\s*reduce' 'Missing reduced motion CSS'
 Assert-Contains 'aria-expanded' 'Missing expandable control semantics'
 Assert-Contains 'IntersectionObserver' 'Missing progressive reveal observer'
