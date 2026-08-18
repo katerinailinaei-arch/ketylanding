@@ -19,4 +19,3 @@ Initial browser inspection was not completed during Task 3. The local browser se
 - Status: **PENDING — scheduled for Task 6**
 - Check: 1240 px inner container and 1440 px page cap; three scenario columns; workshop map geometry; line lengths and CTA hierarchy.
 - Screenshot: pending.
-

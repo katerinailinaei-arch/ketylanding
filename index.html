@@ -30,7 +30,6 @@
       *, *::before, *::after { box-sizing: border-box; }
 
       html {
-        scroll-behavior: smooth;
         scroll-padding-top: 6rem;
         overflow-x: hidden;
         background: var(--bg);
@@ -201,7 +200,7 @@
         border: 1px solid transparent;
         border-radius: 999px;
         background: var(--accent);
-        color: #fff;
+        color: var(--bg);
         font-weight: 750;
         line-height: 1.2;
         text-align: center;
@@ -610,7 +609,9 @@
             <path class="workshop-map__line workshop-map__line--accent" d="M430 260 C480 260 476 116 524 116" marker-end="url(#map-arrow)" />
             <path class="workshop-map__line" d="M430 260 C484 260 478 218 524 218" marker-end="url(#map-arrow)" />
             <path class="workshop-map__line" d="M430 260 C484 260 478 320 524 320" marker-end="url(#map-arrow)" />
-            <path class="workshop-map__line workshop-map__line--accent" d="M604 348 L604 398" marker-end="url(#map-arrow)" />
+            <path class="workshop-map__line workshop-map__line--accent" data-route="website-to-output" d="M604 148 C704 224 704 354 650 410" marker-end="url(#map-arrow)" />
+            <path class="workshop-map__line" data-route="mvp-to-output" d="M604 250 C604 314 620 350 620 410" marker-end="url(#map-arrow)" />
+            <path class="workshop-map__line workshop-map__line--accent" data-route="agent-to-output" d="M604 352 C588 374 586 392 586 410" marker-end="url(#map-arrow)" />
             <g class="workshop-map__node" data-node="input">
               <rect x="44" y="94" width="136" height="76" rx="18" />
               <text x="112" y="126" text-anchor="middle">ИДЕЯ /</text>
