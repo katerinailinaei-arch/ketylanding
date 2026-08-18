@@ -41,6 +41,8 @@ Assert-Contains '<meta[^>]+property="og:image"' 'Missing Open Graph image'
 Assert-Contains '<meta[^>]+name="theme-color"' 'Missing theme color'
 Assert-Contains 'application/ld\+json' 'Missing JSON-LD'
 Assert-Contains 'data-event="cta_telegram_click"' 'Missing analytics hook'
+$globalFaqButtons = [regex]::Matches($html, '(?is)<button\b(?=[^>]*\bdata-event="faq_open")(?=[^>]*\bdata-faq="[^"]+")[^>]*>')
+if ($globalFaqButtons.Count -ne 7) { throw "Expected exactly seven global qualifying FAQ controls. Actual: $($globalFaqButtons.Count)" }
 $faqItems = [regex]::Matches($html, '(?s)<article class="faq-item">.*?</article>')
 if ($faqItems.Count -ne 7) { throw "Expected exactly seven FAQ items. Actual: $($faqItems.Count)" }
 $faqIds = @()
