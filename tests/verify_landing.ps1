@@ -41,6 +41,8 @@ Assert-Contains '<meta[^>]+property="og:image"' 'Missing Open Graph image'
 Assert-Contains '<meta[^>]+name="theme-color"' 'Missing theme color'
 Assert-Contains 'application/ld\+json' 'Missing JSON-LD'
 Assert-Contains 'data-event="cta_telegram_click"' 'Missing analytics hook'
+Assert-Count '<button[^>]+data-event="faq_open"[^>]+data-faq="[^"]+"' 7 'Every FAQ control needs an event and stable context.'
+if ($html -match '<section id="faq"[^>]*data-event=') { throw 'FAQ analytics hook must be on interactive controls.' }
 Write-Host 'PASS: metadata contract'
 
 Assert-Contains 'Превращаю идеи в цифровые решения, которые работают на вас' 'Hero copy mismatch'
