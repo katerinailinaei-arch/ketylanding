@@ -1,0 +1,32 @@
+$ErrorActionPreference = 'Stop'
+$root = Split-Path -Parent $PSScriptRoot
+$landingPath = Join-Path $root 'index.html'
+
+if (-not (Test-Path -LiteralPath $landingPath)) {
+    throw 'index.html is missing'
+}
+
+$html = [System.IO.File]::ReadAllText($landingPath, [System.Text.Encoding]::UTF8)
+
+function Assert-Contains([string]$Pattern, [string]$Message) {
+    if ($html -notmatch $Pattern) { throw $Message }
+}
+
+function Assert-Count([string]$Pattern, [int]$Minimum, [string]$Message) {
+    $count = [regex]::Matches($html, $Pattern).Count
+    if ($count -lt $Minimum) { throw "$Message Actual: $count" }
+}
+
+Assert-Contains '<html[^>]+lang="ru"' 'Missing lang=ru'
+Assert-Count '<h1\b' 1 'Missing h1'
+if ([regex]::Matches($html, '<h1\b').Count -ne 1) { throw 'Page must contain exactly one h1' }
+Assert-Contains '<header\b' 'Missing header'
+Assert-Contains '<nav\b' 'Missing nav'
+Assert-Contains '<main[^>]+id="main"' 'Missing main landmark'
+Assert-Contains '<footer\b' 'Missing footer'
+
+@('solutions','concepts','method','process','about','faq','contact') | ForEach-Object {
+    Assert-Contains "id=`"$_`"" "Missing section id: $_"
+}
+
+Write-Host 'PASS: semantic skeleton'
