@@ -472,56 +472,16 @@
       #about li { padding: 1rem 0; border-top: 1px solid var(--line); color: var(--text-muted); }
       #about li strong { color: var(--text); }
 
-      .portrait-placeholder {
-        position: relative;
+      .portrait {
         grid-row: 1 / span 4;
-        display: grid;
-        min-height: 520px;
-        place-items: end start;
-        overflow: hidden;
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 410 / 574;
+        object-fit: cover;
         border: 1px solid var(--line);
         border-radius: var(--radius-lg);
-        background:
-          radial-gradient(circle at 50% 34%, rgba(80, 213, 255, .19), transparent 16%),
-          radial-gradient(ellipse at 50% 88%, rgba(128, 107, 255, .28), transparent 43%),
-          var(--surface);
-      }
-
-      .portrait-placeholder::before {
-        position: absolute;
-        top: 21%;
-        left: 50%;
-        width: 28%;
-        aspect-ratio: 1;
-        border: 1px solid rgba(244, 241, 234, .35);
-        border-radius: 50%;
-        background: rgba(244, 241, 234, .07);
-        content: "";
-        transform: translateX(-50%);
-      }
-
-      .portrait-placeholder::after {
-        position: absolute;
-        right: 15%;
-        bottom: 12%;
-        left: 15%;
-        height: 44%;
-        border: 1px solid rgba(244, 241, 234, .28);
-        border-radius: 50% 50% 18% 18%;
-        background: rgba(244, 241, 234, .055);
-        content: "";
-      }
-
-      .portrait-placeholder span {
-        z-index: 1;
-        margin: 1rem;
-        padding: .45rem .7rem;
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        background: rgba(16, 17, 22, .82);
-        font: 700 .72rem var(--font-mono);
-        letter-spacing: .1em;
-        text-transform: uppercase;
+        box-shadow: 0 24px 72px rgba(80, 213, 255, .12), var(--shadow);
       }
 
       #faq > h2 { margin-bottom: clamp(2rem, 5vw, 4rem); }
@@ -614,7 +574,7 @@
         #process > .button { margin-top: 1.5rem; width: 100%; }
         #about { grid-template-columns: minmax(0, 1fr); }
         #about h2, #about > p, #about > ul { grid-column: 1; }
-        .portrait-placeholder { grid-column: 1; grid-row: auto; min-height: 400px; }
+        .portrait { grid-column: 1; grid-row: auto; }
         footer { flex-wrap: wrap; }
         footer p:last-child { width: 100%; margin-left: 0; }
       }
@@ -624,7 +584,7 @@
         #concepts > article { grid-template-columns: minmax(0, 1.04fr) minmax(300px, .96fr); }
         #concepts > article:nth-of-type(even) .concept-copy { order: 2; }
         #about { grid-template-columns: minmax(0, 1.05fr) minmax(300px, .75fr); }
-        .portrait-placeholder { grid-column: 2; }
+        .portrait { grid-column: 2; }
       }
 
       @media (min-width: 768px) and (max-width: 1099px) {
@@ -746,7 +706,7 @@
         <article class="process-step"><h3>Проектируем и собираем</h3><p>Согласуем структуру и ключевой сценарий, затем создаём рабочую версию с промежуточными показами.</p><p><strong>Результат этапа:</strong> прототип и реализованное решение.</p></article>
         <article class="process-step"><h3>Проверяем и запускаем</h3><p>Тестируем основные сценарии, исправляем дефекты, публикуем и передаём материалы.</p><p><strong>Результат этапа:</strong> запущенный продукт, доступы и понятные дальнейшие шаги.</p></article>
         <a class="button" href="https://t.me/USERNAME" data-telegram-link data-event="cta_telegram_click" data-location="process" target="_blank" rel="noopener noreferrer">Обсудить задачу в Telegram</a></section>
-      <section id="about"><h2>Технологии — инструмент. В центре всегда ваша задача</h2><p>Я Кети, создатель «Мастерской творений». Соединяю дизайн, разработку и возможности ИИ, чтобы превращать сложные идеи в понятные цифровые инструменты.</p><p>Сейчас я формирую портфолио, поэтому честно показываю собственные концепты вместо вымышленных клиентских историй и особенно внимательно отношусь к логике каждого решения.</p><ul><li><strong>Сначала смысл:</strong> не начинаю разработку с выбора модной технологии.</li><li><strong>Показываю процесс:</strong> ключевые решения и промежуточные результаты видны клиенту.</li><li><strong>Не усложняю без пользы:</strong> MVP решает одну главную задачу.</li><li><strong>Сохраняю контроль:</strong> ИИ помогает человеку, а не скрывает критические действия.</li></ul><div class="portrait-placeholder" role="img" aria-label="Графический заполнитель для будущей фотографии Кети"><span>Фото Кети</span></div></section>
+      <section id="about"><h2>Технологии — инструмент. В центре всегда ваша задача</h2><p>Я Кети, создатель «Мастерской творений». Соединяю дизайн, разработку и возможности ИИ, чтобы превращать сложные идеи в понятные цифровые инструменты.</p><p>Сейчас я формирую портфолио, поэтому честно показываю собственные концепты вместо вымышленных клиентских историй и особенно внимательно отношусь к логике каждого решения.</p><ul><li><strong>Сначала смысл:</strong> не начинаю разработку с выбора модной технологии.</li><li><strong>Показываю процесс:</strong> ключевые решения и промежуточные результаты видны клиенту.</li><li><strong>Не усложняю без пользы:</strong> MVP решает одну главную задачу.</li><li><strong>Сохраняю контроль:</strong> ИИ помогает человеку, а не скрывает критические действия.</li></ul><img class="portrait" src="assets/keti.jpg" alt="Кети — создатель Мастерской творений" width="410" height="574" loading="lazy" decoding="async"></section>
       <section id="faq"><h2>Частые вопросы перед началом</h2>
         <article class="faq-item"><h3><button type="button" aria-expanded="true" aria-controls="faq-answer-1" data-event="faq_open" data-faq="service-format">Как понять, что мне нужно: сайт, приложение или ИИ-агент?</button></h3><p id="faq-answer-1">Необязательно выбирать заранее. На первом обсуждении определим задачу, ограничения и самый простой формат, который способен дать нужный результат.</p></article>
         <article class="faq-item"><h3><button type="button" aria-expanded="true" aria-controls="faq-answer-2" data-event="faq_open" data-faq="pricing">Сколько стоит работа?</button></h3><p id="faq-answer-2">Стоимость определяется после короткого обсуждения задачи. Она зависит от объёма, числа сценариев, интеграций и готовности исходных материалов. До начала работы вы получите понятное предложение по этапам и стоимости.</p></article>

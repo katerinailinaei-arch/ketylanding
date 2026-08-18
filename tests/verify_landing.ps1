@@ -70,6 +70,11 @@ Assert-Contains 'Навигатор' 'Missing AI concept'
 Assert-Count 'class="process-step' 4 'Four process steps required.'
 Assert-Count 'class="faq-item' 7 'Seven FAQ items required.'
 Assert-Count 'Обсудить задачу в Telegram' 3 'Telegram CTA must repeat at least three times.'
+Assert-Contains '<img\b[^>]*class="portrait"[^>]*src="assets/keti\.jpg"[^>]*alt="Кети — создатель Мастерской творений"[^>]*width="410"[^>]*height="574"[^>]*loading="lazy"[^>]*decoding="async"' 'About section must use the accessible optimized Keti portrait.'
+$portraitPath = Join-Path $root 'assets\keti.jpg'
+if (-not (Test-Path -LiteralPath $portraitPath)) { throw 'Keti portrait asset is missing.' }
+if ((Get-Item -LiteralPath $portraitPath).Length -gt 100KB) { throw 'Keti portrait asset must stay under 100 KB.' }
+if ($html -match 'portrait-placeholder') { throw 'Portrait placeholder must be removed.' }
 
 $forbiddenClaims = @('гарантированный результат','лучший эксперт','№1','увеличу продажи в 3 раза')
 $forbiddenClaims | ForEach-Object {
