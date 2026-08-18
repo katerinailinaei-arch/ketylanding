@@ -41,7 +41,16 @@ Assert-Contains '<meta[^>]+property="og:image"' 'Missing Open Graph image'
 Assert-Contains '<meta[^>]+name="theme-color"' 'Missing theme color'
 Assert-Contains 'application/ld\+json' 'Missing JSON-LD'
 Assert-Contains 'data-event="cta_telegram_click"' 'Missing analytics hook'
-Assert-Count '<button[^>]+data-event="faq_open"[^>]+data-faq="[^"]+"' 7 'Every FAQ control needs an event and stable context.'
+$faqItems = [regex]::Matches($html, '(?s)<article class="faq-item">.*?</article>')
+if ($faqItems.Count -ne 7) { throw "Expected exactly seven FAQ items. Actual: $($faqItems.Count)" }
+$faqIds = @()
+foreach ($faqItem in $faqItems) {
+    $faqButton = [regex]::Match($faqItem.Value, '<button[^>]+data-event="faq_open"[^>]+data-faq="([^"]+)"')
+    if (-not $faqButton.Success) { throw 'Every FAQ control needs an event and stable context.' }
+    if ([string]::IsNullOrWhiteSpace($faqButton.Groups[1].Value)) { throw 'FAQ context must not be empty.' }
+    $faqIds += $faqButton.Groups[1].Value
+}
+if ((@($faqIds | Select-Object -Unique)).Count -ne 7) { throw 'FAQ context values must be unique.' }
 if ($html -match '<section id="faq"[^>]*data-event=') { throw 'FAQ analytics hook must be on interactive controls.' }
 Write-Host 'PASS: metadata contract'
 
