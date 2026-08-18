@@ -67,3 +67,12 @@ Write-Host 'PASS: primary CTA contrast contract'
     Assert-Contains "data-route=`"$_-to-output`"" "Missing workshop route from $_ to final output"
 }
 Write-Host 'PASS: workshop convergence contract'
+
+@('function initMenu','function initConcepts','function initFaq','function initReveal','function applySiteConfig') | ForEach-Object {
+    if (-not $html.Contains($_)) { throw "Missing interaction function: $_" }
+}
+Assert-Contains 'prefers-reduced-motion:\s*reduce' 'Missing reduced motion CSS'
+Assert-Contains 'aria-expanded' 'Missing expandable control semantics'
+Assert-Contains 'IntersectionObserver' 'Missing progressive reveal observer'
+Assert-Contains 'class="no-js"' 'Missing no-js baseline class'
+Write-Host 'PASS: interaction contract'
