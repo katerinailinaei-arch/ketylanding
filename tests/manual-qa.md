@@ -1,29 +1,42 @@
-# Manual viewport QA
+# Manual viewport QA — Task 6
 
-Initial browser inspection was not completed during Task 3. The local browser setup attempt did not return, so no visual result is inferred from static checks.
+Evidence reviewed on 2026-08-18. Task 6 CSS changes fully reverted; no post-fix visual or runtime claim is made. The 375 px headless PNG is unreliable evidence because Edge may have used a minimum layout viewport width and/or cropped the capture. Therefore a reproducible real overflow, `.hero__copy` as root cause, and RED/GREEN or post-fix results must not be asserted.
 
-## 375×812
+## Cross-viewport visual checks
 
-- Status: **PENDING — scheduled for Task 6**
-- Check: no horizontal page scroll; full-width primary CTA; hero copy precedes workshop map; sticky header does not obstruct content.
-- Screenshot: pending.
+| Required check | 375×812 | 768×1024 | 1440×900 | Notes / evidence |
+| --- | --- | --- | --- | --- |
+| Hero communicates the offer and exposes a primary CTA | BLOCKED | PASS | PASS | 768 and 1440 first-screen screenshots show a readable offer and CTA. The 375 PNG cannot establish reliable viewport geometry or clipping. |
+| No horizontal page overflow | BLOCKED | BLOCKED | BLOCKED | No reliable full-page geometry measurement exists. The 375 capture is unreliable evidence; 768/1440 screenshots cover only the first screen. |
+| H1 line breaks are intentional and unclipped | BLOCKED | PASS | PASS | 768/1440 H1 is fully visible in first-screen evidence. 375 cannot be judged from the unreliable capture. |
+| Header/menu is usable and does not obscure content | BLOCKED | BLOCKED | PASS (visual only) | Desktop header is visually clear at 1440. Mobile/tablet interaction and focus behavior were not exercised. |
+| Three scenarios are readable | BLOCKED | BLOCKED | BLOCKED | Below captured first screen; no inspection evidence. |
+| Three permanent concept disclosures are readable | BLOCKED | BLOCKED | BLOCKED | Below captured first screen; no inspection evidence. |
+| Concept panels do not clip or overflow | BLOCKED | BLOCKED | BLOCKED | No concept-panel screenshots or geometry measurements. |
+| Process layout remains readable | BLOCKED | BLOCKED | BLOCKED | Section not inspected. |
+| About layout remains readable | BLOCKED | BLOCKED | BLOCKED | Section not inspected. |
+| FAQ state and final CTA are clear | BLOCKED | BLOCKED | BLOCKED | Sections not inspected. |
+| No layout jump during load | BLOCKED | BLOCKED | BLOCKED | Settled screenshots cannot prove load stability. |
 
-## 768×1024
+## Interaction and accessibility checks
 
-- Status: **PENDING — scheduled for Task 6**
-- Check: two-column hero; readable concept panels; process cards preserve DOM order; focus indicators remain visible.
-- Screenshot: pending.
+All browser runtime interaction and accessibility checks remain BLOCKED: skip link, keyboard/focus traversal, mobile menu, concept tabs, FAQ ARIA state, zoom/reflow, reduced motion, contrast, and JavaScript-disabled rendered baseline were not exercised in a controllable browser session.
 
-## 1440×900
-
-- Status: **PENDING — scheduled for Task 6**
-- Check: 1240 px inner container and 1440 px page cap; three scenario columns; workshop map geometry; line lengths and CTA hierarchy.
-- Screenshot: pending.
-
-## Task 4 interaction and motion QA
+## Runtime and release checks
 
 | Check | Status | Evidence |
 | --- | --- | --- |
-| Keyboard: skip link, menu Escape/focus return, concept tabs, FAQ toggle and visible focus | BLOCKED | No controllable browser was available in this environment on 2026-08-18; do not infer interactive behavior from static checks. |
-| Reduced motion: no reveal transition or decorative motion | BLOCKED | Browser emulation was unavailable. The implementation gates `initReveal()` on `prefers-reduced-motion` and has a reduced-motion CSS override; this still requires browser confirmation. |
-| JavaScript syntax | PASS | `node` compiled both behavioral inline scripts successfully. |
+| No console errors | BLOCKED | No controllable browser console capture. |
+| No unexpected external network requests | BLOCKED | No browser network capture. |
+| Telegram placeholder is the known publication blocker | BLOCKED | Publish-ready remains blocked by placeholder configuration; do not claim release readiness. |
+| Development-mode static test | PASS | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/verify_landing.ps1` exits 0. |
+| Node probe | PASS | `node tests/probe_interactions.mjs` exits 0; this is a static/null-site-config regression probe, not browser interaction QA. |
+| Publish-ready | BLOCKED | Placeholder Telegram/owner publication markers remain unresolved. |
+
+## Repair record
+
+- Task 6 CSS changes are fully reverted.
+- The 375 headless PNG is unreliable evidence due to probable Edge minimum layout width and/or crop; no reproducible real overflow is claimed.
+- `.hero__copy` is not established as a root cause.
+- No RED/GREEN or post-fix result is claimed for the unverified 375 issue.
+- Runtime interaction QA remains BLOCKED.
