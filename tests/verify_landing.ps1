@@ -70,10 +70,7 @@ Assert-Contains 'Навигатор' 'Missing AI concept'
 Assert-Count 'class="process-step' 4 'Four process steps required.'
 Assert-Count 'class="faq-item' 7 'Seven FAQ items required.'
 Assert-Count 'Обсудить задачу в Telegram' 3 'Telegram CTA must repeat at least three times.'
-Assert-Contains '<img\b[^>]*class="portrait"[^>]*src="assets/keti\.jpg"[^>]*alt="Кети — создатель Мастерской творений"[^>]*width="410"[^>]*height="574"[^>]*loading="lazy"[^>]*decoding="async"' 'About section must use the accessible optimized Keti portrait.'
-$portraitPath = Join-Path $root 'assets\keti.jpg'
-if (-not (Test-Path -LiteralPath $portraitPath)) { throw 'Keti portrait asset is missing.' }
-if ((Get-Item -LiteralPath $portraitPath).Length -gt 100KB) { throw 'Keti portrait asset must stay under 100 KB.' }
+Assert-Contains '<img\b[^>]*class="portrait"[^>]*src="data:image/jpeg;base64,[^"]+"[^>]*alt="Кети — создатель Мастерской творений"[^>]*width="410"[^>]*height="574"[^>]*loading="lazy"[^>]*decoding="async"' 'Keti portrait must be embedded for a self-contained HTML file.'
 if ($html -match 'portrait-placeholder') { throw 'Portrait placeholder must be removed.' }
 
 $forbiddenClaims = @('гарантированный результат','лучший эксперт','№1','увеличу продажи в 3 раза')
@@ -104,6 +101,9 @@ Write-Host 'PASS: workshop convergence contract'
 @('function initMenu','function initConcepts','function initFaq','function initReveal','function applySiteConfig') | ForEach-Object {
     if (-not $html.Contains($_)) { throw "Missing interaction function: $_" }
 }
+@('function initBackToTop','function initContactForm','function initCounters') | ForEach-Object {
+    if (-not $html.Contains($_)) { throw "Missing requested interaction function: $_" }
+}
 Assert-Contains 'function initMethod' 'Missing method-stage interaction function'
 Assert-Count '<button\b[^>]*\bdata-method-stage(?:\s|=|>)' 5 'Five native method-stage buttons required.'
 Assert-Contains 'prefers-reduced-motion:\s*reduce' 'Missing reduced motion CSS'
@@ -115,6 +115,18 @@ Write-Host 'PASS: interaction contract'
 Assert-Contains '(?s)\.no-js\s+\.nav-menu-toggle\s*\{[^}]*display:\s*none' 'No-JS baseline must hide the inert menu toggle'
 Assert-Contains '(?s)\.no-js\s+\.nav-links\s*\{[^}]*display:\s*flex' 'No-JS baseline must keep navigation links visible'
 Write-Host 'PASS: no-JS navigation baseline'
+
+Assert-Contains '<button\b[^>]*class="nav-menu-toggle"[^>]*aria-label="Открыть меню"[^>]*>\s*<span[^>]*></span>\s*<span[^>]*></span>\s*<span[^>]*></span>\s*</button>' 'Mobile menu must use an accessible three-line hamburger control.'
+Assert-Contains '<button\b[^>]*id="back-to-top"[^>]*aria-label="Наверх"[^>]*hidden' 'Missing accessible back-to-top button.'
+Assert-Contains '<form\b[^>]*id="contact-form"[^>]*novalidate' 'Missing demo contact form.'
+Assert-Contains '<input\b[^>]*id="contact-name"[^>]*name="name"[^>]*autocomplete="name"[^>]*required' 'Contact name field contract is missing.'
+Assert-Contains '<input\b[^>]*id="contact-email"[^>]*name="email"[^>]*type="email"[^>]*autocomplete="email"[^>]*required' 'Contact email field contract is missing.'
+Assert-Contains '<textarea\b[^>]*id="contact-message"[^>]*name="message"[^>]*required' 'Contact message field contract is missing.'
+Assert-Contains 'id="form-status"[^>]*role="status"[^>]*aria-live="polite"' 'Contact form needs an accessible success status.'
+Assert-Contains 'Демонстрационная форма: сообщение не отправляется' 'Demo form disclosure is missing.'
+Assert-Count 'data-counter-target="(?:3|5|1)"' 3 'Three honest counters are required.'
+if ($html -match '(?i)(?:src|href)="(?:assets/|\.\.?/)') { throw 'index.html must not depend on relative local assets.' }
+Write-Host 'PASS: requested interactive and self-contained contracts'
 
 if ($PublishReady) {
     $unresolvedMarkers = @(
