@@ -80,6 +80,35 @@
         pointer-events: none;
       }
 
+      .scroll-progress {
+        position: fixed;
+        inset: 0 0 auto;
+        z-index: 1000;
+        height: 3px;
+        pointer-events: none;
+      }
+
+      .scroll-progress span {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--success));
+        box-shadow: 0 0 18px rgba(80, 213, 255, .6);
+        transform: scaleX(var(--scroll-progress, 0));
+        transform-origin: left center;
+        will-change: transform;
+      }
+
+      .ambient-spotlight {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background: radial-gradient(32rem circle at var(--pointer-x, 75%) var(--pointer-y, 15%), rgba(80, 213, 255, .095), transparent 68%);
+        opacity: var(--spotlight-opacity, 0);
+        pointer-events: none;
+        transition: opacity .35s ease;
+      }
+
       img, svg { display: block; max-width: 100%; }
       h1, h2, h3, p { margin-top: 0; }
       h1, h2, h3 { text-wrap: balance; }
@@ -222,6 +251,7 @@
       .nav-cta { flex: 0 0 auto; }
 
       .button {
+        position: relative;
         display: inline-flex;
         min-height: 48px;
         align-items: center;
@@ -236,7 +266,25 @@
         line-height: 1.2;
         text-align: center;
         text-decoration: none;
+        overflow: hidden;
+        transform: translate3d(var(--magnetic-x, 0), var(--magnetic-y, 0), 0);
+        transition: transform .22s cubic-bezier(.2, .8, .2, 1), box-shadow .22s ease, background-color .22s ease;
       }
+
+      .button:hover { box-shadow: 0 14px 34px rgba(128, 107, 255, .28); }
+
+      .button-ripple {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, .5);
+        pointer-events: none;
+        transform: translate(-50%, -50%) scale(0);
+        animation: button-ripple .58s ease-out forwards;
+      }
+
+      @keyframes button-ripple { to { opacity: 0; transform: translate(-50%, -50%) scale(18); } }
 
       .button::after { content: "↗"; font-family: var(--font-mono); }
 
@@ -249,12 +297,35 @@
       .button--secondary::after { content: "↓"; }
 
       .hero {
+        position: relative;
         display: grid;
         min-height: min(850px, calc(100svh - 76px));
         align-items: center;
         gap: clamp(2.5rem, 7vw, 6rem);
         padding-block: clamp(4rem, 8vw, 8rem);
       }
+
+      .hero::before {
+        position: absolute;
+        top: 9%;
+        left: 38%;
+        z-index: -1;
+        width: min(42rem, 70vw);
+        aspect-ratio: 1;
+        border-radius: 46% 54% 63% 37%;
+        background: conic-gradient(from 110deg, rgba(128, 107, 255, .22), rgba(80, 213, 255, .1), rgba(113, 215, 160, .08), rgba(128, 107, 255, .22));
+        filter: blur(68px);
+        content: "";
+        animation: aurora-drift 12s ease-in-out infinite alternate;
+      }
+
+      .js .hero__copy > * { animation: hero-rise .72s both cubic-bezier(.2, .8, .2, 1); }
+      .js .hero__copy > :nth-child(2) { animation-delay: .08s; }
+      .js .hero__copy > :nth-child(3) { animation-delay: .16s; }
+      .js .hero__copy > :nth-child(4) { animation-delay: .24s; }
+      .js .hero__copy > :nth-child(5) { animation-delay: .32s; }
+      @keyframes hero-rise { from { opacity: 0; transform: translateY(22px); } }
+      @keyframes aurora-drift { to { border-radius: 62% 38% 40% 60%; transform: translate3d(5%, -4%, 0) rotate(12deg) scale(1.08); } }
 
       .hero__copy > p:not(.eyebrow) { max-width: 57ch; color: var(--text-muted); }
 
@@ -306,6 +377,10 @@
       .workshop-map__output rect { fill: rgba(113, 215, 160, .09); stroke: var(--success); }
       .workshop-map__output text { fill: var(--success); font: 700 14px var(--font-mono); letter-spacing: .06em; }
       .workshop-map__status { fill: var(--accent-2); }
+      .workshop-map__line--accent { stroke-dasharray: 9 12; animation: route-flow 3.4s linear infinite; }
+      .workshop-map__status { transform-box: fill-box; transform-origin: center; animation: status-pulse 1.9s ease-in-out infinite; }
+      @keyframes route-flow { to { stroke-dashoffset: -42; } }
+      @keyframes status-pulse { 50% { opacity: .45; transform: scale(1.8); } }
 
       main > section { padding-block: var(--section-space); }
       main > section + section { border-top: 1px solid rgba(244, 241, 234, .08); }
@@ -367,36 +442,69 @@
       .concept-copy dt { color: var(--text-muted); font-family: var(--font-mono); font-size: .76rem; letter-spacing: .08em; text-transform: uppercase; }
       .concept-copy dd { margin: 0; }
 
-      .concept-visual {
+      .concept-mockup {
+        --tilt-x: 0deg;
+        --tilt-y: 0deg;
+        --glow-x: 50%;
+        --glow-y: 50%;
         position: relative;
-        min-height: 320px;
+        display: grid;
+        min-height: 360px;
+        place-items: center;
+        padding: clamp(1rem, 3vw, 2rem);
         overflow: hidden;
         border: 1px solid var(--line);
-        background: #12141b;
+        background: radial-gradient(24rem circle at var(--glow-x) var(--glow-y), rgba(128, 107, 255, .13), transparent 62%), #12141b;
+        font-size: .72rem;
+        transform: perspective(1100px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+        transform-style: preserve-3d;
+        transition: transform .18s ease-out, background .18s ease-out;
       }
+      .mock-shell { width: 100%; max-width: 520px; overflow: hidden; border: 1px solid #3a3f4d; border-radius: 16px; background: var(--surface-raised); box-shadow: 0 30px 60px rgba(0, 0, 0, .32); transform: translateZ(24px); }
+      .mock-topbar { display: flex; min-height: 34px; align-items: center; gap: 5px; padding: 0 12px; border-bottom: 1px solid #343846; color: var(--text-muted); }
+      .mock-topbar i { width: 6px; height: 6px; border-radius: 50%; background: #505563; }
+      .mock-topbar i:first-child { background: var(--accent); }
+      .mock-topbar small { margin-left: auto; font: 600 .62rem var(--font-mono); }
+      .mock-pill { display: inline-flex; align-items: center; gap: .35rem; padding: .38rem .62rem; border: 1px solid var(--line); border-radius: 999px; color: var(--text-muted); }
+      .mock-pill--success { border-color: rgba(113, 215, 160, .4); background: rgba(113, 215, 160, .1); color: #A8E7C4; }
+      .mock-pill--warning { border-color: rgba(255, 186, 92, .45); background: rgba(255, 186, 92, .1); color: #FFD098; }
 
-      .concept-visual::before {
-        position: absolute;
-        inset: 9% 8%;
-        border: 1px solid #3a3f4d;
-        border-radius: 16px;
-        background: var(--surface-raised);
-        box-shadow: 0 36px 70px rgba(0, 0, 0, .35);
-        content: "";
-      }
+      .expert-screen { display: grid; grid-template-columns: 1.2fr .8fr; gap: 1rem; padding: 1.25rem; }
+      .expert-screen h4 { max-width: 11ch; margin: .45rem 0; font-size: clamp(1.3rem, 3.2vw, 2rem); line-height: 1; }
+      .expert-screen p { margin: 0 0 1rem; color: var(--text-muted); line-height: 1.45; }
+      .expert-cta { display: inline-flex; padding: .58rem .78rem; border-radius: 999px; background: var(--accent); color: var(--bg); font-weight: 800; }
+      .expert-card { display: grid; align-content: end; min-height: 170px; padding: 1rem; border-radius: 13px; background: linear-gradient(150deg, rgba(80, 213, 255, .19), rgba(128, 107, 255, .2)); }
+      .expert-card strong { font-size: 1rem; }
+      .expert-card span { margin-top: .35rem; color: var(--text-muted); }
+      .expert-trust { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; padding: 0 1.25rem 1.25rem; }
+      .expert-trust span { padding: .55rem; border: 1px solid var(--line); border-radius: 9px; color: var(--text-muted); text-align: center; }
 
-      .concept-visual span { position: absolute; display: block; z-index: 1; border-radius: 999px; background: #373b49; }
-      .concept-visual span:nth-child(1) { top: 16%; left: 14%; width: 38%; height: 9px; background: var(--accent); }
-      .concept-visual span:nth-child(2) { top: 24%; left: 14%; width: 56%; height: 7px; }
-      .concept-visual span:nth-child(3) { top: 34%; left: 14%; width: 33%; height: 35%; border-radius: 12px; background: rgba(80, 213, 255, .12); border: 1px solid rgba(80, 213, 255, .35); }
-      .concept-visual span:nth-child(4) { top: 34%; right: 14%; width: 34%; height: 16%; border-radius: 12px; background: rgba(128, 107, 255, .16); border: 1px solid rgba(128, 107, 255, .45); }
-      .concept-visual span:nth-child(5) { top: 56%; right: 14%; width: 34%; height: 13%; border-radius: 12px; }
-      .concept-visual--app span:nth-child(3) { width: 18%; height: 46%; background: #262a35; border-color: #3a3f4d; }
-      .concept-visual--app span:nth-child(4) { right: 14%; width: 48%; height: 28%; }
-      .concept-visual--app span:nth-child(5) { top: 66%; right: 14%; width: 48%; height: 12%; background: rgba(113, 215, 160, .18); }
-      .concept-visual--ai span:nth-child(3) { width: 25%; height: 13%; border-radius: 999px; }
-      .concept-visual--ai span:nth-child(4) { top: 51%; left: 14%; right: auto; width: 46%; height: 13%; border-radius: 999px; }
-      .concept-visual--ai span:nth-child(5) { top: 68%; right: 14%; width: 52%; height: 8px; background: var(--success); }
+      .portal-layout { display: grid; grid-template-columns: 92px 1fr; min-height: 280px; }
+      .portal-sidebar { display: grid; align-content: start; gap: .75rem; padding: 1rem .75rem; border-right: 1px solid #343846; color: var(--text-muted); }
+      .portal-sidebar strong { color: var(--text); }
+      .portal-sidebar span:first-of-type { color: var(--accent-cyan); }
+      .portal-main { display: grid; gap: .8rem; padding: 1rem; }
+      .portal-heading { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+      .portal-heading strong { font-size: 1rem; }
+      .portal-progress { height: 8px; overflow: hidden; border-radius: 999px; background: #343846; }
+      .portal-progress span { display: block; width: 68%; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-cyan)); }
+      .portal-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: .7rem; }
+      .portal-card { padding: .8rem; border: 1px solid var(--line); border-radius: 11px; background: rgba(244, 241, 234, .025); }
+      .portal-card strong { display: block; margin-bottom: .45rem; }
+      .portal-task { display: flex; align-items: center; gap: .55rem; margin-top: .45rem; color: var(--text-muted); }
+      .portal-task::before { width: 9px; height: 9px; border: 2px solid var(--accent-cyan); border-radius: 50%; content: ""; }
+
+      .agent-body { display: grid; gap: .85rem; padding: 1rem; }
+      .agent-flow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .35rem; }
+      .agent-flow span { position: relative; padding: .55rem .35rem; border: 1px solid var(--line); border-radius: 9px; color: var(--text-muted); text-align: center; }
+      .agent-flow span:not(:last-child)::after { position: absolute; top: 50%; right: -.32rem; z-index: 1; color: var(--accent-cyan); content: "›"; transform: translateY(-50%); }
+      .agent-flow span:last-child { border-color: rgba(113, 215, 160, .4); color: #A8E7C4; }
+      .agent-workspace { display: grid; grid-template-columns: 1fr .82fr; gap: .7rem; }
+      .agent-chat, .agent-log { display: grid; gap: .55rem; padding: .8rem; border: 1px solid var(--line); border-radius: 11px; }
+      .agent-bubble { padding: .6rem .7rem; border-radius: 10px 10px 10px 3px; background: rgba(80, 213, 255, .1); color: var(--text-muted); }
+      .agent-bubble--draft { border-radius: 10px 10px 3px 10px; background: rgba(128, 107, 255, .15); color: var(--text); }
+      .agent-log span { display: flex; align-items: center; gap: .45rem; color: var(--text-muted); }
+      .agent-log span::before { color: var(--success); content: "✓"; }
 
       #method ol {
         display: grid;
@@ -518,8 +626,22 @@
       }
       .concept-tabs button[aria-selected="true"] { border-color: var(--accent); background: rgba(128, 107, 255, .2); color: var(--text); }
 
+      .js #concepts > article:not([hidden]) { animation: concept-enter .46s cubic-bezier(.2, .8, .2, 1) both; }
+      @keyframes concept-enter { from { opacity: 0; transform: translateY(14px) scale(.99); } }
+
       .reveal.is-pending { opacity: 0; transform: translateY(1rem); }
       .reveal.is-visible { opacity: 1; transform: translateY(0); transition: opacity 240ms ease, transform 240ms ease; }
+
+      @supports (animation-timeline: view()) {
+        #solutions article,
+        .process-step,
+        .counter-card {
+          animation: card-arrive linear both;
+          animation-timeline: view();
+          animation-range: entry 8% cover 32%;
+        }
+        @keyframes card-arrive { from { opacity: .35; transform: translateY(22px) scale(.985); } }
+      }
 
       #contact {
         margin-block: var(--section-space);
@@ -567,8 +689,10 @@
       .form-note { color: var(--text-muted); font-size: .85rem; }
       .form-status { display: flex; min-height: 52px; align-items: center; gap: .7rem; color: var(--accent-cyan); font-weight: 750; }
       .form-status::before { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; background: rgba(80, 213, 255, .14); content: "✓"; transform: scale(0); }
-      .form-status.is-success::before { animation: success-pop .38s cubic-bezier(.2, .8, .2, 1) forwards; }
-      @keyframes success-pop { to { transform: scale(1); } }
+      .form-status.is-success { animation: success-glow .72s ease both; }
+      .form-status.is-success::before { animation: success-pop .52s cubic-bezier(.2, 1.5, .4, 1) forwards; }
+      @keyframes success-pop { 65% { transform: scale(1.22) rotate(-8deg); } 100% { transform: scale(1); } }
+      @keyframes success-glow { 45% { filter: drop-shadow(0 0 13px rgba(80, 213, 255, .48)); } }
 
       .back-to-top {
         position: fixed;
@@ -633,7 +757,16 @@
         #solutions { display: block; }
         #solutions article { min-height: 330px; margin-top: 1rem; }
         #concepts > article { grid-template-columns: minmax(0, 1fr); }
-        .concept-visual { min-height: 270px; }
+        .ambient-spotlight { display: none; }
+        .concept-mockup { min-height: 300px; padding: .75rem; font-size: .67rem; transform: none; }
+        .expert-screen { grid-template-columns: 1fr .72fr; padding: .85rem; }
+        .expert-card { min-height: 140px; padding: .7rem; }
+        .expert-trust { padding: 0 .85rem .85rem; }
+        .portal-layout { grid-template-columns: 72px 1fr; }
+        .portal-sidebar { padding: .75rem .5rem; }
+        .portal-main { padding: .75rem; }
+        .agent-flow { grid-template-columns: repeat(5, minmax(46px, 1fr)); overflow-x: auto; }
+        .agent-workspace { grid-template-columns: 1fr; }
         .concept-copy dl { grid-template-columns: 1fr; }
         .concept-copy dd { margin-bottom: .65rem; }
         #process { display: block; }
@@ -670,10 +803,15 @@
           scroll-behavior: auto !important;
           transition-duration: .01ms !important;
         }
+        .ambient-spotlight { display: none; }
+        .hero::before, .workshop-map__line--accent, .workshop-map__status { animation: none !important; }
+        .button, .concept-mockup, .mock-shell { transform: none !important; }
       }
     </style>
   </head>
   <body>
+    <div class="scroll-progress" id="scroll-progress" aria-hidden="true"><span></span></div>
+    <div class="ambient-spotlight" aria-hidden="true"></div>
     <script type="application/json" id="site-config">{"telegramUrl":"https://t.me/USERNAME"}</script>
     <a class="skip-link" href="#main">Перейти к содержимому</a>
     <header class="site-header" id="top">
@@ -757,15 +895,15 @@
         </div>
         <article id="concept-website">
           <div class="concept-copy"><p>Собственный концепт — не клиентский проект</p><h3>Точка опоры</h3><dl><dt>Тип</dt><dd>Сайт для консультанта или автора программы.</dd><dt>Задача</dt><dd>Ясно раскрыть ценность услуги и привести посетителя к записи.</dd><dt>Решение</dt><dd>Hero с результатом, программа, формат работы, доверие, FAQ, запись.</dd><dt>Артефакты</dt><dd>Desktop- и mobile-мокапы, карта с секциями.</dd></dl><p>Помогает превратить экспертность в понятный путь к обращению.</p></div>
-          <div class="concept-visual" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="concept-mockup concept-mockup--expert" role="img" aria-label="Макет интерфейса сайта эксперта с описанием услуги и записью на консультацию"><div class="mock-shell"><div class="mock-topbar"><i></i><i></i><i></i><small>точка-опоры.рф</small></div><div class="expert-screen"><div><span class="mock-pill">Стратег • Наставник</span><h4>Ясность для следующего шага</h4><p>Помогаю экспертам собрать сильную программу и уверенно вывести её на рынок.</p><span class="expert-cta">Записаться на консультацию</span></div><div class="expert-card"><strong>Стратегическая сессия</strong><span>90 минут • план действий</span></div></div><div class="expert-trust"><span>12 лет практики</span><span>Авторский метод</span><span>Личный формат</span></div></div></div>
         </article>
         <article id="concept-app">
           <div class="concept-copy"><p>Собственный концепт — не клиентский проект</p><h3>Пульс проекта</h3><dl><dt>Тип</dt><dd>Web-приложение для сопровождения клиентов.</dd><dt>Задача</dt><dd>Собрать задачи, материалы, прогресс и коммуникацию в одном месте.</dd><dt>Решение</dt><dd>Dashboard, этапы, файлы, сообщения, ближайшее действие.</dd><dt>Артефакты</dt><dd>Ключевой пользовательский путь и 3–4 экрана.</dd></dl><p>Помогает запустить и проверить основную ценность продукта без лишнего scope.</p></div>
-          <div class="concept-visual concept-visual--app" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="concept-mockup concept-mockup--portal" role="img" aria-label="Макет интерфейса клиентского кабинета с прогрессом проекта и ближайшими задачами"><div class="mock-shell"><div class="mock-topbar"><i></i><i></i><i></i><small>Пульс проекта</small></div><div class="portal-layout"><aside class="portal-sidebar"><strong>PP</strong><span>Обзор</span><span>Этапы</span><span>Файлы</span><span>Сообщения</span></aside><div class="portal-main"><div class="portal-heading"><strong>Проект готов на 68%</strong><span class="mock-pill mock-pill--success">В работе</span></div><div class="portal-progress"><span></span></div><div class="portal-grid"><div class="portal-card"><strong>Ближайшее действие</strong><div class="portal-task">Согласовать структуру главной</div><div class="portal-task">Добавить материалы эксперта</div></div><div class="portal-card"><strong>Этапы</strong><div class="portal-task">Исследование ✓</div><div class="portal-task">Прототип</div></div><div class="portal-card"><strong>Новые файлы</strong><span>brief.pdf • 2,4 МБ</span></div><div class="portal-card"><strong>Сообщения</strong><span>Кети: обновила прототип</span></div></div></div></div></div></div>
         </article>
         <article id="concept-ai">
           <div class="concept-copy"><p>Собственный концепт — не клиентский проект</p><h3>Навигатор</h3><dl><dt>Тип</dt><dd>ИИ-автоматизация для малого бизнеса.</dd><dt>Задача</dt><dd>Разбирать входящие обращения и готовить следующий шаг.</dd><dt>Решение</dt><dd>Запрос → поиск в базе знаний → черновик ответа → проверка человеком → запись действия.</dd><dt>Артефакты</dt><dd>Схема данных, экран диалога и журнал действий.</dd></dl><p>Сокращает повторяющуюся работу, сохраняя контроль у человека.</p></div>
-          <div class="concept-visual concept-visual--ai" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="concept-mockup concept-mockup--agent" role="img" aria-label="Макет интерфейса ИИ-агента с обработкой обращения и проверкой человеком"><div class="mock-shell"><div class="mock-topbar"><i></i><i></i><i></i><small>Навигатор • AI workflow</small></div><div class="agent-body"><div class="agent-flow"><span>Запрос</span><span>База знаний</span><span>Черновик</span><span>Проверка</span><span>Готово</span></div><div class="portal-heading"><strong>Обращение #184</strong><span class="mock-pill mock-pill--warning">Нужна проверка</span></div><div class="agent-workspace"><div class="agent-chat"><div class="agent-bubble">Можно перенести встречу на пятницу?</div><strong>Черновик ответа</strong><div class="agent-bubble agent-bubble--draft">Да, свободно время в 12:00 и 15:30. Какой вариант удобнее?</div></div><div class="agent-log"><strong>Журнал действий</strong><span>Найдена политика переноса</span><span>Проверен календарь</span><span>Ответ ждёт подтверждения</span></div></div></div></div></div>
         </article>
       </section>
       <section id="method"><h2>Сначала задача. Затем — подходящий инструмент</h2><ol><li><button class="method-stage is-active" type="button" data-method-stage aria-current="step"><strong>ЗАДАЧА</strong> — Что должно измениться для клиента или команды?</button></li><li><button class="method-stage" type="button" data-method-stage><strong>ДИАГНОСТИКА</strong> — Кому, зачем и в каком контексте нужно решение?</button></li><li><button class="method-stage" type="button" data-method-stage><strong>ФОРМАТ</strong> — Сайт, MVP, автоматизация или их комбинация.</button></li><li><button class="method-stage" type="button" data-method-stage><strong>ПРОТОТИП</strong> — Проверяем структуру и основной сценарий.</button></li><li><button class="method-stage" type="button" data-method-stage><strong>ЗАПУСК</strong> — Собираем, тестируем, передаём и улучшаем.</button></li></ol></section>
@@ -1052,6 +1190,99 @@
         counters.forEach((counter) => observer.observe(counter));
       }
 
+      function initPremiumMotion() {
+        const progress = document.querySelector('#scroll-progress span');
+        const spotlight = document.querySelector('.ambient-spotlight');
+        const finePointer = window.matchMedia('(pointer: fine)');
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        let frame = 0;
+
+        const updateScrollProgress = () => {
+          frame = 0;
+          if (!progress) return;
+          const maximum = document.documentElement.scrollHeight - window.innerHeight;
+          const ratio = maximum > 0 ? Math.min(Math.max(window.scrollY / maximum, 0), 1) : 0;
+          progress.style.setProperty('--scroll-progress', ratio.toFixed(4));
+        };
+        const requestProgressUpdate = () => {
+          if (!frame) frame = requestAnimationFrame(updateScrollProgress);
+        };
+        window.addEventListener('scroll', requestProgressUpdate, { passive: true });
+        window.addEventListener('resize', requestProgressUpdate, { passive: true });
+        updateScrollProgress();
+
+        const removePointerEffects = () => {
+          document.documentElement.style.removeProperty('--pointer-x');
+          document.documentElement.style.removeProperty('--pointer-y');
+          document.documentElement.style.removeProperty('--spotlight-opacity');
+          document.querySelectorAll('.button').forEach((button) => {
+            button.style.removeProperty('--magnetic-x');
+            button.style.removeProperty('--magnetic-y');
+          });
+          document.querySelectorAll('.concept-mockup').forEach((mockup) => {
+            mockup.style.removeProperty('--tilt-x');
+            mockup.style.removeProperty('--tilt-y');
+            mockup.style.removeProperty('--glow-x');
+            mockup.style.removeProperty('--glow-y');
+          });
+        };
+
+        if (finePointer.matches && !reducedMotion.matches) {
+          document.addEventListener('pointermove', (event) => {
+            document.documentElement.style.setProperty('--pointer-x', `${event.clientX}px`);
+            document.documentElement.style.setProperty('--pointer-y', `${event.clientY}px`);
+            document.documentElement.style.setProperty('--spotlight-opacity', spotlight ? '1' : '0');
+          }, { passive: true });
+
+          document.querySelectorAll('.button').forEach((button) => {
+            button.addEventListener('pointermove', (event) => {
+              const rect = button.getBoundingClientRect();
+              const x = ((event.clientX - rect.left) / rect.width - .5) * 10;
+              const y = ((event.clientY - rect.top) / rect.height - .5) * 8;
+              button.style.setProperty('--magnetic-x', `${x.toFixed(2)}px`);
+              button.style.setProperty('--magnetic-y', `${y.toFixed(2)}px`);
+            });
+            button.addEventListener('pointerleave', () => {
+              button.style.setProperty('--magnetic-x', '0px');
+              button.style.setProperty('--magnetic-y', '0px');
+            });
+          });
+
+          document.querySelectorAll('.concept-mockup').forEach((mockup) => {
+            mockup.addEventListener('pointermove', (event) => {
+              const rect = mockup.getBoundingClientRect();
+              const x = Math.min(Math.max((event.clientX - rect.left) / rect.width, 0), 1);
+              const y = Math.min(Math.max((event.clientY - rect.top) / rect.height, 0), 1);
+              mockup.style.setProperty('--tilt-x', `${((.5 - y) * 6).toFixed(2)}deg`);
+              mockup.style.setProperty('--tilt-y', `${((x - .5) * 7).toFixed(2)}deg`);
+              mockup.style.setProperty('--glow-x', `${(x * 100).toFixed(1)}%`);
+              mockup.style.setProperty('--glow-y', `${(y * 100).toFixed(1)}%`);
+            });
+            mockup.addEventListener('pointerleave', () => {
+              mockup.style.setProperty('--tilt-x', '0deg');
+              mockup.style.setProperty('--tilt-y', '0deg');
+              mockup.style.setProperty('--glow-x', '50%');
+              mockup.style.setProperty('--glow-y', '50%');
+            });
+          });
+        } else {
+          removePointerEffects();
+        }
+
+        document.querySelectorAll('.button').forEach((button) => {
+          button.addEventListener('pointerdown', (event) => {
+            if (reducedMotion.matches) return;
+            const rect = button.getBoundingClientRect();
+            const ripple = document.createElement('span');
+            ripple.className = 'button-ripple';
+            ripple.style.left = `${event.clientX - rect.left}px`;
+            ripple.style.top = `${event.clientY - rect.top}px`;
+            ripple.addEventListener('animationend', () => ripple.remove(), { once: true });
+            button.appendChild(ripple);
+          });
+        });
+      }
+
       applySiteConfig();
       initMenu();
       initConcepts();
@@ -1061,6 +1292,7 @@
       initBackToTop();
       initContactForm();
       initCounters();
+      initPremiumMotion();
     </script>
   </body>
 </html>

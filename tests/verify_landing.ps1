@@ -128,6 +128,25 @@ Assert-Count 'data-counter-target="(?:3|5|1)"' 3 'Three honest counters are requ
 if ($html -match '(?i)(?:src|href)="(?:assets/|\.\.?/)') { throw 'index.html must not depend on relative local assets.' }
 Write-Host 'PASS: requested interactive and self-contained contracts'
 
+Assert-Count 'class="concept-mockup concept-mockup--(?:expert|portal|agent)"' 3 'Three distinct recognizable concept mockups are required.'
+Assert-Count 'role="img" aria-label="Макет интерфейса [^"]+"' 3 'Each concept mockup needs an accessible description.'
+@('Записаться на консультацию','Проект готов на 68%','Нужна проверка','Черновик ответа','Ближайшее действие') | ForEach-Object {
+    if (-not $html.Contains($_)) { throw "Concept mockup lacks meaningful UI content: $_" }
+}
+if ($html -match 'class="concept-visual(?:\s|"|--)') { throw 'Abstract concept-visual placeholders must be removed.' }
+Write-Host 'PASS: recognizable portfolio mockup contract'
+
+Assert-Contains '<div\b[^>]*class="scroll-progress"[^>]*id="scroll-progress"[^>]*aria-hidden="true"' 'Premium motion needs an unobtrusive scroll progress indicator.'
+Assert-Contains '<div\b[^>]*class="ambient-spotlight"[^>]*aria-hidden="true"' 'Premium motion needs a decorative pointer spotlight.'
+Assert-Contains 'function\s+initPremiumMotion\s*\(' 'Premium motion initializer is missing.'
+Assert-Contains "matchMedia\('\(pointer:\s*fine\)'\)" 'Pointer effects must be limited to fine-pointer devices.'
+Assert-Contains 'animation-timeline:\s*(?:scroll|view)\(\)' 'Progressive scroll-driven animation enhancement is missing.'
+Assert-Contains '@supports\s*\(animation-timeline:\s*(?:scroll|view)\(\)\)' 'Scroll-driven animation needs a feature-query guard.'
+Assert-Contains '(?s)@media\s*\(prefers-reduced-motion:\s*reduce\).*?\.ambient-spotlight\s*\{[^}]*display:\s*none' 'Reduced-motion mode must disable the ambient spotlight.'
+Assert-Contains '--tilt-x' 'Concept mockups need bounded 3D tilt variables.'
+Assert-Contains "ripple\.className\s*=\s*'button-ripple'" 'Buttons need a transient press ripple created by the interaction script.'
+Write-Host 'PASS: premium kinetic motion contract'
+
 if ($PublishReady) {
     $unresolvedMarkers = @(
         @{ Pattern = 'USERNAME'; Message = 'Publish-ready blocked: replace Telegram USERNAME with the owner-supplied username.' },
